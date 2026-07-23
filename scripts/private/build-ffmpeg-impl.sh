@@ -29,7 +29,6 @@ function build_one {
   NM="${PREBUILT}/bin/llvm-nm"
   STRIP="${PREBUILT}/bin/llvm-strip"
   RANLIB="${PREBUILT}/bin/llvm-ranlib"
-  YASM="${PREBUILT}/bin/yasm"
 
   validate_file "$CC"
   validate_file "$CXX"
@@ -38,7 +37,6 @@ function build_one {
   validate_file "$LD"
   validate_file "$NM"
   validate_file "$STRIP"
-  validate_file "$YASM"
   validate_file "$RANLIB"
 
   echo "Cleaning..."
@@ -189,22 +187,6 @@ configure_and_build() {
       LD=$CC
       AS=$CC
     ;;
-    x86_64)
-      CROSS_PREFIX=$PREBUILT/bin/x86_64-linux-android
-      ARCH=x86_64
-      CPU=x86-64
-      PLATFORM=x86_64
-      ADDITIONAL_CONFIGURE_FLAGS=(--enable-x86asm --x86asmexe="$YASM")
-      OPTIMIZE_CFLAGS="-march=${CPU}"
-      EXTRA_LIBS="-lunwind"
-      EXTRA_LDFLAGS=""
-
-      PREFIX=./build/$FLAVOR/$PLATFORM
-      CC=${CROSS_PREFIX}${ANDROID_API}-clang
-      CXX=${CROSS_PREFIX}${ANDROID_API}-clang++
-      LD=$CC
-      AS=$CC
-    ;;
 	  armeabi-v7a)
       CROSS_PREFIX=$PREBUILT/bin/armv7a-linux-androideabi
       ARCH=arm
@@ -228,29 +210,6 @@ configure_and_build() {
       fi
       PREFIX=./build/$FLAVOR/$PLATFORM
     ;;
-    x86)
-      CROSS_PREFIX=$PREBUILT/bin/i686-linux-android
-      CC=${CROSS_PREFIX}${ANDROID_API}-clang
-      CXX=${CROSS_PREFIX}${ANDROID_API}-clang++
-      AS=$CC
-      ARCH=x86
-      CPU=i686
-      PLATFORM=i686
-      ADDITIONAL_CONFIGURE_FLAGS=(--disable-asm --disable-x86asm)
-      OPTIMIZE_CFLAGS=""
-      if [[ ${ANDROID_NDK_VERSION%%.*} -ge 23 ]]; then
-        LD=$CC
-        LIBS_DIR="${PREBUILT}/lib64/clang/12.0.9/lib/linux"
-        validate_dir "$LIBS_DIR"
-        EXTRA_LDFLAGS="-L${LIBS_DIR}"
-        EXTRA_LIBS=-lclang_rt.builtins-i686-android
-      else
-        LD="${PREBUILT}/i686-linux-android/bin/ld.gold"
-        EXTRA_LDFLAGS=""
-        EXTRA_LIBS="-lgcc"
-      fi
-      PREFIX=./build/$FLAVOR/$PLATFORM
-    ;;
     *)
       echo "Unknown abi: ${ABI}" >&2
       exit 1
@@ -260,9 +219,9 @@ configure_and_build() {
   build_one
 }
 
-for ABI in arm64-v8a x86_64 armeabi-v7a x86 ; do
+for ABI in arm64-v8a armeabi-v7a ; do
   for FLAVOR in $FLAVORS; do
-    if [[ "$FLAVOR" != "legacy" || $ABI == "armeabi-v7a" || $ABI == "x86" ]]; then
+    if [[ "$FLAVOR" != "legacy" || $ABI == "armeabi-v7a" ]]; then
       echo -e "${STYLE_INFO}- ffmpeg build start: ${ABI} ${FLAVOR}${STYLE_END}"
       configure_and_build "$FLAVOR" "$ABI"
       echo -e "${STYLE_INFO}- ffmpeg build finish: ${ABI} ${FLAVOR}${STYLE_END}"
