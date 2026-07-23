@@ -27,8 +27,8 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
     val properties = loadProperties(parameters.properties.get().asFile)
     val defaults = loadProperties(parameters.defaults.get().asFile)
 
-    val applicationName = getOrDefault(properties, "app.name", defaults)
-    val applicationId = getOrDefault(properties, "app.id", defaults)
+    val applicationName = "Telegram X"
+    val applicationId = "org.thunderdog.challegram"
     val isExampleBuild = false
     val isExperimentalBuild = false
     val applicationExtension = getOrDefault(properties, "tgx.extension", defaults).also {
