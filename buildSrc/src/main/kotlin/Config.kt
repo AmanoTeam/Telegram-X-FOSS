@@ -17,8 +17,6 @@ import tgx.gradle.fatal
 import tgx.gradle.getIntOrThrow
 import tgx.gradle.getLongOrThrow
 import tgx.gradle.getOrThrow
-import tgx.gradle.loadProperties
-import java.io.File
 import java.util.*
 
 object Config {
@@ -107,26 +105,8 @@ data class ApplicationConfig(
   val pullRequests: List<PullRequest>,
 
   val outputFileNamePrefix: String,
-  val creationDateMillis: Long,
-
-  val keystorePropertiesPath: String?
+  val creationDateMillis: Long
 )
-
-data class Keystore(
-  val file: File,
-  val password: String,
-  val keyAlias: String,
-  val keyPassword: String
-) {
-  constructor(configPath: String) : this(loadProperties(configPath))
-  constructor(file: File) : this(loadProperties(file))
-  constructor(config: org.jetbrains.kotlin.konan.properties.Properties) : this(
-    file = File(config.getOrThrow("keystore.file")),
-    password = config.getOrThrow("keystore.password"),
-    keyAlias = config.getOrThrow("key.alias"),
-    keyPassword = config.getOrThrow("key.password")
-  )
-}
 
 class AbiVariant (val flavor: String, vararg val filters: String = arrayOf(), val displayName: String = filters[0]) {
   init {
