@@ -16,9 +16,6 @@ rust.dir=
 # Location of the MSYS2. This is only used on Windows.
 msys2.dir=
 
-## Path to the keystore file
-keystore.file=
-
 ## Path to a google-services.json used instead of the one in the repository
 google_services.file=
 
