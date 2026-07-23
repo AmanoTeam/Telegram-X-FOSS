@@ -8,8 +8,6 @@
     com.otaliastudios.opengl
 
     minSdk 19:
-    com.google.android.recaptcha
-    com.google.android.play.core.integrity.client
     androidx.annotation.experimental
     androidx.media3.datasource
     androidx.media3.muxer
@@ -27,8 +25,6 @@
   <uses-sdk tools:overrideLibrary="
     com.otaliastudios.transcoder,
     com.otaliastudios.opengl,
-    com.google.android.recaptcha,
-    com.google.android.play.core.integrity.client,
     androidx.annotation.experimental,
     androidx.media3.transformer,
     androidx.media3.effect,
