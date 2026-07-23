@@ -3,6 +3,7 @@ package tgx.gradle.task
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.*
 import tgx.gradle.createEmptyDir
+import tgx.gradle.fatal
 import tgx.gradle.ndkVersionMajor
 import tgx.gradle.requireDir
 import tgx.gradle.requireFile
@@ -79,18 +80,14 @@ abstract class BuildFfmpegTask : BuildNativeLibraryTask() {
       "-fPIC",
       "-flto=full"
     )
-    val clangLibs = requireDir(
-      when (ndkVersionMajor) {
-        23 ->
-          prebuilt.resolve("lib64/clang/12.0.9/lib/linux")
-        27 ->
-          prebuilt.resolve("lib/clang/18/lib/linux")
-        30 ->
-          prebuilt.resolve("lib/clang/21/lib/linux")
-        else ->
-          error("Unsupported NDK version: $ndkVersion")
-      }
-    )
+    val clangLibs by lazy {
+      listOf("lib64/clang", "lib/clang").mapNotNull { base ->
+        prebuilt.resolve(base).listFiles { file -> file.isDirectory }
+          ?.map { it.resolve("lib/linux") }
+          ?.firstOrNull { it.isDirectory }
+      }.firstOrNull()
+        ?: fatal("Failed to find clang runtime libraries in $prebuilt")
+    }
     val extraLibs = mutableListOf<String>()
     val ndkAbi: String
     when (abi) {
@@ -118,7 +115,8 @@ abstract class BuildFfmpegTask : BuildNativeLibraryTask() {
           "-I${cpuFeatures.toPosixPath()}"
         ))
         ldFlags.addAll(listOf(
-          "-L${clangLibs.toPosixPath()}",
+"-L${clangLibs.toPosixPath()}",
+          "-L${clangLibs.resolve("arm").toPosixPath()}",
           "-Wl,--fix-cortex-a8"
         ))
         extraLibs.addAll(listOf(
