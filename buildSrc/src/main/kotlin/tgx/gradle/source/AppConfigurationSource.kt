@@ -6,7 +6,6 @@ import PullRequest
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ValueSource
 import org.gradle.api.provider.ValueSourceParameters
-import tgx.gradle.fatal
 import tgx.gradle.getIntOrThrow
 import tgx.gradle.getOrThrow
 import tgx.gradle.loadProperties
@@ -40,18 +39,6 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
       require(it == "none" || it == "hms")
     }
 
-    if (properties.getProperty("telegram.api_id", "").isEmpty() || properties.getProperty("telegram.api_hash").isEmpty()) {
-      fatal("""
-        Telegram API credentials missing.
-        
-        Set them in your local.properties file:
-        telegram.api_id=YOUR_API_ID_HERE
-        telegram.api_hash=YOUR_API_HASH_HERE
-        
-        Obtain them at https://core.telegram.org/api/obtaining_api_id
-      """.trimIndent())
-    }
-
     return ApplicationConfig(
       // local.properties & local.properties.sample
       sdkDir =
@@ -74,9 +61,9 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
         isExampleBuild ||
           properties.getProperty("app.dontobfuscate")?.toBoolean() ?: false,
       telegramApiId =
-        properties.getIntOrThrow("telegram.api_id"),
+        105810,
       telegramApiHash =
-        properties.getOrThrow("telegram.api_hash"),
+        "3e7a52498eec003c5896a330e5d29397",
       safetyNetToken =
         properties.getProperty("safetynet.api_key", ""),
       appDownloadUrl =
