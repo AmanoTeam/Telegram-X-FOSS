@@ -16,7 +16,6 @@ import tgx.gradle.findExtraFolders
 import tgx.gradle.ndkVersionMajor
 import tgx.gradle.ndkVersionToMinSdk
 import tgx.gradle.source.AppBuildVersionSource
-import tgx.gradle.source.KeystoreSource
 import java.io.File
 
 @Suppress("UnstableApiUsage")
@@ -71,13 +70,6 @@ open class ModulePlugin : Plugin<Project> {
     }
 
     val androidExt = project.extensions.getByName("android")
-    val keystore = config?.keystorePropertiesPath?.let { keystorePropertiesPath ->
-      project.providers.of(KeystoreSource::class) {
-        parameters.properties.set(
-          project.rootProject.projectDir.resolve(keystorePropertiesPath)
-        )
-      }
-    }
 
     androidExt.apply {
       when (this) {
@@ -181,28 +173,9 @@ open class ModulePlugin : Plugin<Project> {
             targetSdk = build.targetSdkVersion
             multiDexEnabled = true
           }
-          keystore?.orNull?.let { keystore ->
-            signingConfigs {
-              arrayOf(
-                getByName("debug"),
-                maybeCreate("release")
-              ).forEach { config ->
-                config.storeFile = keystore.file
-                config.storePassword = keystore.password
-                config.keyAlias = keystore.keyAlias
-                config.keyPassword = keystore.keyPassword
-                config.enableV2Signing = true
-                config.enableV3Signing = true
-                if (config.name == "debug") {
-                  config.enableV4Signing = true
-                }
-              }
-            }
-
+          config?.let { config ->
             buildTypes {
               getByName("debug") {
-                signingConfig = signingConfigs["debug"]
-
                 isDebuggable = true
                 isJniDebuggable = true
                 isMinifyEnabled = false
@@ -221,8 +194,6 @@ open class ModulePlugin : Plugin<Project> {
               }
 
               getByName("release") {
-                signingConfig = signingConfigs["release"]
-
                 isMinifyEnabled = !config.doNotObfuscate
                 isShrinkResources = !config.doNotObfuscate
 
@@ -267,28 +238,9 @@ open class ModulePlugin : Plugin<Project> {
             jniLibs.directories += "jniLibs"
           }
 
-          keystore?.orNull?.let { keystore ->
-            signingConfigs {
-              arrayOf(
-                getByName("debug"),
-                maybeCreate("release")
-              ).forEach { config ->
-                config.storeFile = keystore.file
-                config.storePassword = keystore.password
-                config.keyAlias = keystore.keyAlias
-                config.keyPassword = keystore.keyPassword
-                config.enableV2Signing = true
-                config.enableV3Signing = true
-                if (config.name == "debug") {
-                  config.enableV4Signing = true
-                }
-              }
-            }
-
+          config?.let { config ->
             buildTypes {
               getByName("debug") {
-                signingConfig = signingConfigs["debug"]
-
                 isDebuggable = true
                 isJniDebuggable = true
                 isMinifyEnabled = false
@@ -307,8 +259,6 @@ open class ModulePlugin : Plugin<Project> {
               }
 
               getByName("release") {
-                signingConfig = signingConfigs["release"]
-
                 isMinifyEnabled = !config.doNotObfuscate
                 isShrinkResources = !config.doNotObfuscate
 
