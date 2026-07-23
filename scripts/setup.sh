@@ -14,6 +14,10 @@ if [[ -f local.properties ]]; then
   echo -e "${STYLE_INFO}local.properties already exists.${STYLE_END}"
 fi
 
+# == Setup thirdparty libraries ==
+
+patch-opusfile-impl.sh
+
 # == Copy local.properties ===
 
 if [[ ! -f local.properties ]]; then
