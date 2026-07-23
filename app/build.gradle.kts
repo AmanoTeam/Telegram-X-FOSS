@@ -230,14 +230,13 @@ android {
       variantBuilder.maxSdk = sdkVariant.maxSdk
     }
     variantBuilder.enable = sdkVariant.minSdk >= abiVariant.minSdk &&
-      !(abiVariant.flavor == "universal" && sdkVariant.flavor == "legacy") &&
-      (variantBuilder.buildType != "debug" || sdkVariant.flavor == "legacy" || abiVariant.flavor == "universal")
+      (variantBuilder.buildType != "debug" || abiVariant.flavor == "universal")
   }
   productFlavors {
     Sdk.VARIANTS.forEach { (sdkIndex, variant) ->
       create(variant.flavor) {
         dimension = "SDK"
-        isDefault = sdkIndex == Sdk.LATEST
+        isDefault = sdkIndex == Sdk.MARSHMALLOW
 
         val actualMinSdk = if (config.isHuaweiBuild) {
           maxOf(variant.minSdk, Config.MIN_SDK_VERSION_HUAWEI)
@@ -293,6 +292,7 @@ android {
         Sdk.VARIANTS.forEach { (subSdkIndex, subVariant) ->
           buildConfigBool("${subVariant.flavor.uppercase()}_FLAVOR", sdkIndex == subSdkIndex)
         }
+        buildConfigBool("LATEST_FLAVOR", sdkIndex == Sdk.LATEST)
 
         var extraProguardFileCount = 0
 
@@ -519,7 +519,6 @@ gradle.projectsEvaluated {
 }
 
 dependencies {
-  legacyImplementation(libs.androidx.multidex)
   implementation(project(":extension:${config.extension}"))
   // TDLib: https://github.com/tdlib/td/blob/master/CHANGELOG.md
   implementation(project(":tdlib"))
@@ -690,8 +689,6 @@ dependencies {
   preMarshmallowImplementation(libs.relinker)
   // Konfetti: https://github.com/DanielMartinus/Konfetti/blob/main/README.md
   implementation(libs.konfetti)
-  // Transcoder: https://github.com/natario1/Transcoder/blob/master/docs/_about/changelog.md
-  legacyImplementation(libs.transcoder)
   // https://github.com/mikereedell/sunrisesunsetlib-java
   implementation(libs.sunriseSunsetCalculator)
 

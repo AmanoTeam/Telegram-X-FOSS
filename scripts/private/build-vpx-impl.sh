@@ -41,7 +41,7 @@ configure_abi() {
   LDFLAGS_=""
   case ${FLAVOR} in
     legacy)
-      ANDROID_API=16
+      ANDROID_API=21
     ;;
     lollipop)
       ANDROID_API=21
