@@ -491,10 +491,8 @@ android {
           proguardFile("proguard-r8-bug-android-4.x-workaround.pro")
         }
 
-        if (selectedMinSdk > Sdk.VARIANTS[Sdk.LEGACY]!!.minSdk) {
-          lint {
-            disable += "ObsoleteSdkInt"
-          }
+        lint {
+          disable += "ObsoleteSdkInt"
         }
 
         val flags = listOf(
@@ -846,7 +844,6 @@ dependencies {
     libs.androidx.tracing.lollipop,
     libs.androidx.tracing.latest
   )
-  legacyImplementation(libs.androidx.multidex)
   implementation(project(":extension:${config.extension}"))
   // TDLib: https://github.com/tdlib/td/blob/master/CHANGELOG.md
   implementation(project(":tdlib"))
@@ -1017,8 +1014,6 @@ dependencies {
   preMarshmallowImplementation(libs.relinker)
   // Konfetti: https://github.com/DanielMartinus/Konfetti/blob/main/README.md
   implementation(libs.konfetti)
-  // Transcoder: https://github.com/natario1/Transcoder/blob/master/docs/_about/changelog.md
-  legacyImplementation(libs.transcoder)
   // https://github.com/mikereedell/sunrisesunsetlib-java
   implementation(libs.sunriseSunsetCalculator)
 

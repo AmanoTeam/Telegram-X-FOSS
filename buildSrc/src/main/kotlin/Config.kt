@@ -22,8 +22,8 @@ import java.io.File
 import java.util.*
 
 object Config {
-  const val MIN_SDK_VERSION = 16
-  const val MIN_SDK_VERSION_HUAWEI = 17
+  const val MIN_SDK_VERSION = 21
+  const val MIN_SDK_VERSION_HUAWEI = 21
   val JAVA_VERSION = org.gradle.api.JavaVersion.VERSION_21
   val ANDROIDX_MEDIA_EXTENSIONS = arrayOf(
     "decoder_ffmpeg",
@@ -186,37 +186,15 @@ data class SdkVariant(
     flavor == "latest"
   val isMarshmallow: Boolean =
     flavor == "marshmallow"
-  val isLollipop: Boolean =
-    flavor == "lollipop"
-  val isLegacy: Boolean =
-    flavor == "legacy"
 }
 
 object Sdk {
-  const val LEGACY = 0
-  const val LOLLIPOP = 1
-  const val MARSHMALLOW = 2
   const val LATEST = 3
 
   val VARIANTS = mapOf(
-    Pair(LEGACY, SdkVariant(
-      flavor = "legacy",
-      minSdk = 16,
-      maxSdk = 20
-    )),
-    Pair(LOLLIPOP, SdkVariant(
-      flavor = "lollipop",
-      minSdk = 21,
-      maxSdk = 22
-    )),
-    Pair(MARSHMALLOW, SdkVariant(
-      flavor = "marshmallow",
-      minSdk = 23,
-      maxSdk = 23
-    )),
     Pair(LATEST, SdkVariant(
       flavor = "latest",
-      minSdk = 24,
+      minSdk = 23,
       displayName = null
     ))
   )

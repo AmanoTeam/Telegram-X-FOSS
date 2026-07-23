@@ -43,24 +43,6 @@ fun VariantDimension.buildConfigLong (name: String, value: Long) =
 fun VariantDimension.buildConfigString (name: String, value: String?) =
   this.buildConfigField("String", name, value?.wrapInDoubleQuotes() ?: "null")
 
-fun DependencyHandlerScope.legacyImplementation(
-  dependency: Provider<MinimalExternalModuleDependency>,
-  dependencyConfiguration: Action<ExternalModuleDependency>? = null
-) =
-  this.flavorImplementation("legacy", dependency, dependencyConfiguration)
-
-fun DependencyHandlerScope.sinceLollipopImplementation(
-  dependency: Provider<MinimalExternalModuleDependency>,
-  dependencyConfiguration: Action<ExternalModuleDependency>? = null
-) =
-  this.flavorImplementation(null, dependency, dependency, dependency, dependencyConfiguration)
-
-fun DependencyHandlerScope.lollipopImplementation(
-  dependency: Provider<MinimalExternalModuleDependency>,
-  dependencyConfiguration: Action<ExternalModuleDependency>? = null
-) =
-  this.flavorImplementation("lollipop", dependency, dependencyConfiguration)
-
 fun DependencyHandlerScope.sinceMarshmallowImplementation(
   dependency: Provider<MinimalExternalModuleDependency>,
   dependencyConfiguration: Action<ExternalModuleDependency>? = null
@@ -193,8 +175,7 @@ fun DependencyHandlerScope.flavorImplementation(
 }
 
 fun isVariantEnabled(sdkVariant: SdkVariant, abiVariant: AbiVariant, isDebug: Boolean): Boolean =
-  sdkVariant.minSdk >= abiVariant.minSdk &&
-  !(abiVariant.flavor == "universal" && sdkVariant.flavor == "legacy")
+  sdkVariant.minSdk >= abiVariant.minSdk
 
 fun ApplicationAndroidComponentsExtension.disableRudimentaryVariants(
   filter: (SdkVariant, AbiVariant) -> Boolean = { _, _ -> true }

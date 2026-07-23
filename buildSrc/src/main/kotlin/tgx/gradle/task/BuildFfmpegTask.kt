@@ -36,10 +36,10 @@ abstract class BuildFfmpegTask : BuildNativeLibraryTask() {
       "sysroot"
     ))
     val androidApiLevel = when (flavor) {
-      "legacy" -> 16
+      "legacy" -> 21
       "lollipop" -> 21
       "marshmallow" -> 23
-      "latest" -> 24
+      "latest" -> 23
       else -> error("Unknown flavor: $flavor")
     }
 

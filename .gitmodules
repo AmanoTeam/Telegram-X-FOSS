@@ -21,11 +21,6 @@
 	path = app/jni/third_party/lz4
 	url = https://github.com/lz4/lz4
 	shallow = true
-[submodule "androidx-media"]
-	path = app/thirdparty/androidx-media/legacy
-	url = https://github.com/androidx/media
-	shallow = true
-	branch = release
 [submodule "flac"]
 	path = app/jni/third_party/flac
 	url = https://github.com/xiph/flac
@@ -131,7 +126,4 @@
 	url = https://chromium.googlesource.com/chromium/src/third_party
 [submodule "thirdparty/androidx-media/latest"]
 	path = app/thirdparty/androidx-media/latest
-	url = https://github.com/androidx/media
-[submodule "thirdparty/androidx-media/lollipop"]
-	path = app/thirdparty/androidx-media/lollipop
 	url = https://github.com/androidx/media
