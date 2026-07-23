@@ -29,12 +29,8 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
 
     val applicationName = getOrDefault(properties, "app.name", defaults)
     val applicationId = getOrDefault(properties, "app.id", defaults)
-    val isExampleBuild = applicationId.matches(Regex(
-      "^(?:com|org)\\.example\\.(?:\\.[a-z]+)+$"
-    ))
-    val isExperimentalBuild =
-      isExampleBuild ||
-      properties.getProperty("app.experimental", "false") == "true"
+    val isExampleBuild = false
+    val isExperimentalBuild = false
     val applicationExtension = getOrDefault(properties, "tgx.extension", defaults).also {
       require(it == "none" || it == "hms")
     }
