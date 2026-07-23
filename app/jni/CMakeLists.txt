@@ -36,24 +36,15 @@ set(VPX_DIR "${LIBVPX_DIR}/${ANDROID_ABI}")
 set(VPX_LIB_PATH "${VPX_DIR}/lib/libvpx.a")
 
 # == Constants ==
-# $IS_ARM_FAMILY – armeabi-v7a or arm64-v8a
 
-if (${ANDROID_ABI} STREQUAL "armeabi-v7a" OR ${ANDROID_ABI} STREQUAL "arm64-v8a")
-  set(IS_ARM_FAMILY yes)
-else()
-  set(IS_ARM_FAMILY no)
-endif()
+set(IS_ARM_FAMILY yes)
 
 # == CMake global settings ==
 
 set(CMAKE_SKIP_RPATH ON)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
-if (${IS_ARM_FAMILY})
-  enable_language(ASM)
-else()
-  enable_language(ASM_NASM)
-endif()
+enable_language(ASM)
 set(ORIGINAL_CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS}")
 
 add_compile_options(
@@ -258,7 +249,7 @@ target_link_options(${NATIVE_LIB} PRIVATE
   "$<$<CONFIG:Release,RelWithDebInfo,MinSizeRel>:-flto=full>"
 )
 
-if (${ANDROID_ABI} STREQUAL "arm64-v8a" OR ${ANDROID_ABI} STREQUAL "x86_64")
+if (${ANDROID_ABI} STREQUAL "arm64-v8a")
   # Enable 16 KB ELF alignment.
   target_link_options(${NATIVE_LIB} PRIVATE
     "-Wl,-z,max-page-size=16384"

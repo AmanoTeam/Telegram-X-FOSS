@@ -27,7 +27,6 @@ object Config {
     "decoder_opus",
     "decoder_vp9"
   )
-
   val FFMPEG_LIBS = arrayOf(
     "swresample",
     "avformat",
@@ -36,7 +35,7 @@ object Config {
     "avfilter",
     "avutil"
   )
-  val SUPPORTED_ABI = arrayOf("armeabi-v7a", "arm64-v8a", "x86_64", "x86")
+  val SUPPORTED_ABI = arrayOf("armeabi-v7a", "arm64-v8a")
 }
 
 data class PullRequest (
@@ -143,7 +142,7 @@ class AbiVariant (val flavor: String, vararg val filters: String = arrayOf(), va
   val is64Bit: Boolean
     get() {
       for (filter in filters) {
-        if (filter != "arm64-v8a" && filter != "x86_64") {
+        if (filter != "arm64-v8a") {
           return false
         }
       }
@@ -168,17 +167,13 @@ object Abi {
   const val UNIVERSAL = 0
   const val ARMEABI_V7A = 1
   const val ARM64_V8A = 2
-  const val X86 = 3
-  const val X64 = 4
   const val LAB = 5
 
   val VARIANTS = mapOf(
     Pair(UNIVERSAL, AbiVariant("universal", displayName = "universal", filters = arrayOf("arm64-v8a", "armeabi-v7a"))),
     Pair(ARMEABI_V7A, AbiVariant("arm32", "armeabi-v7a")),
     Pair(ARM64_V8A, AbiVariant("arm64", "arm64-v8a")),
-    Pair(X86, AbiVariant("x86", "x86")),
-    Pair(X64, AbiVariant("x64", "x86_64", displayName = "x64")),
-    Pair(LAB, AbiVariant("lab", displayName = "testing", filters = arrayOf("arm64-v8a", "armeabi-v7a", "x86_64", "x86"))),
+    Pair(LAB, AbiVariant("lab", displayName = "testing", filters = arrayOf("arm64-v8a", "armeabi-v7a"))),
   )
 }
 
