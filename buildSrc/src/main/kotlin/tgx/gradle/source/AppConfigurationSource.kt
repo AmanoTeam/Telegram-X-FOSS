@@ -60,8 +60,6 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
         105810,
       telegramApiHash =
         "3e7a52498eec003c5896a330e5d29397",
-      safetyNetToken =
-        properties.getProperty("safetynet.api_key", ""),
       appDownloadUrl =
         getOrDefault(properties, "app.download_url", defaults),
       googlePlayUrl =

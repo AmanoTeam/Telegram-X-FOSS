@@ -97,7 +97,6 @@ data class ApplicationConfig(
 
   val telegramApiId: Int,
   val telegramApiHash: String,
-  val safetyNetToken: String?,
   val appDownloadUrl: String?,
   val googlePlayUrl: String?,
   val galaxyStoreUrl: String?,
