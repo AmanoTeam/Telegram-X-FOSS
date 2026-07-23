@@ -198,10 +198,14 @@ configure_and_build() {
       CXX=$PREBUILT/bin/armv7a-linux-androideabi${ANDROID_API}-clang++
       AS=$CC
       if [[ ${ANDROID_NDK_VERSION%%.*} -ge 23 ]]; then
+        CC=$PREBUILT/bin/armv7a-linux-androideabi${ANDROID_API}-clang
         LD=$CC
-        LIBS_DIR="${PREBUILT}/lib64/clang/12.0.9/lib/linux"
-        validate_dir "$LIBS_DIR"
-        EXTRA_LDFLAGS="-L${LIBS_DIR} -Wl,--fix-cortex-a8"
+        CLANG_RT_DIR=$(${CC} -print-resource-dir)
+        validate_dir "$CLANG_RT_DIR"
+        CLANG_RT_LIB_DIR="${CLANG_RT_DIR}/lib/linux"
+        validate_file "$CLANG_RT_LIB_DIR/libclang_rt.builtins-arm-android.a"
+        validate_file "$CLANG_RT_LIB_DIR/arm/libunwind.a"
+        EXTRA_LDFLAGS="-L${CLANG_RT_LIB_DIR} -L${CLANG_RT_LIB_DIR}/arm -Wl,--fix-cortex-a8"
         EXTRA_LIBS="-lunwind -lclang_rt.builtins-arm-android"
       else
         LD="${PREBUILT}/arm-linux-androideabi/bin/ld.gold"
@@ -215,6 +219,8 @@ configure_and_build() {
       exit 1
     ;;
   esac
+
+  EXTRA_LIBS="$(${CC} -print-libgcc-file-name)"
 
   build_one
 }
