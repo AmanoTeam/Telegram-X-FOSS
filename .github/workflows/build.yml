@@ -1,0 +1,99 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    branches:
+        - '**'
+  push:
+    branches:
+        - '**'
+
+permissions: write-all
+
+jobs:
+  build:
+    name: Build (${{ matrix.target }}, ${{ matrix.variant.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ['gcc', 'clang']
+        variant:
+          - name: LatestUniversal
+            task: 'assembleLatestUniversalRelease'
+            args: ''
+          - name: LollipopUniversal
+            task: 'assembleLollipopUniversalRelease'
+            args: ''
+          - name: MarshmallowUniversal
+            task: 'assembleMarshmallowUniversalRelease'
+            args: ''
+          - name: LegacyArm32
+            task: 'assembleLegacyArm32Release'
+            args: '-PuseLegacyNdk=true'
+    steps:
+      - uses: actions/checkout@main
+        with:
+          submodules: recursive
+      - name: Set swap space
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 20
+      - uses: actions/setup-java@main
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+      - name: Install required dependencies
+        run: |
+          sudo apt install meson gperf
+          "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install 'ndk;23.2.8568313'
+      - name: Install android-gcc-cross
+        if: matrix.target == 'gcc'
+        run: |
+          declare -r PINO_TARBALL='/tmp/gcc.tar.xz'
+          declare -r PINO_URL='https://github.com/AmanoTeam/android-gcc-cross/releases/latest/download/x86_64-unknown-linux-gnu.tar.xz'
+          
+          curl --connect-timeout '10' --retry '15' --retry-all-errors --fail --silent --location --url "${PINO_URL}" --output "${PINO_TARBALL}"
+          tar --directory="$(dirname "${PINO_TARBALL}")" --extract --file="${PINO_TARBALL}"
+                  
+          echo 'PINO_STATIC=true' >> "${GITHUB_ENV}"
+          echo 'PINO_NEON=true' >> "${GITHUB_ENV}"
+          echo 'PINO_OPT_LEVEL=2' >> "${GITHUB_ENV}"
+          echo 'PINO_HOME=/tmp/android-gcc-cross' >> "${GITHUB_ENV}"
+
+          /tmp/android-gcc-cross/bin/ndk-patch
+      - name: Update gcc-wrapper
+        if: matrix.target == 'gcc'
+        run: |
+          "${PINO_HOME}/bin/update-wrapper"
+      - name: Build
+        run: |
+          ./scripts/setup.sh --skip-sdk-setup
+          ./gradlew "${{ matrix.variant.task }}" ${{ matrix.variant.args }}
+      - name: Sign APKs
+        run: |
+          declare -r APKSIGNER="$(find "${ANDROID_HOME}/build-tools" -name apksigner | sort -V | tail -1)"
+          declare -r KEYSTORE_FILE="${GITHUB_WORKSPACE}/scripts/testkey.p12"
+
+          for apk in app/build/outputs/apk/*/release/*.apk; do
+            "${APKSIGNER}" sign --ks "${KEYSTORE_FILE}" --ks-pass pass:123456 --ks-key-alias testkey --key-pass pass:123456 "${apk}"
+            "${APKSIGNER}" verify "${apk}"
+          done
+      - name: Create logs
+        if: always()
+        run: |
+          tar --create --file=- '/var/tmp/obggcc' | xz --threads='0' --compress -9 > '/tmp/logs.tar.xz'
+      - name: Upload logs
+        if:  always()
+        uses: actions/upload-artifact@main
+        with:
+          name: logs-${{ matrix.target }}-${{ matrix.variant.name }}
+          if-no-files-found: error
+          path: |
+              /tmp/logs.tar.xz
+      - name: Upload artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: build-${{ matrix.target }}-${{ matrix.variant.name }}
+          path: app/build/outputs/apk/*/release/*.apk
+
