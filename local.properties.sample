@@ -10,9 +10,6 @@ sdk.dir=
 # Location of the MSYS2. This is only used on Windows.
 msys2.dir=
 
-## Path to the keystore file
-keystore.file=
-
 ## Package name
 app.id=org.example.tgx
 

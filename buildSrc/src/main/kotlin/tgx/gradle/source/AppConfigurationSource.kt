@@ -32,10 +32,6 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
     val properties = loadProperties(parameters.properties.get().asFile)
     val defaults = loadProperties(parameters.defaults.get().asFile)
 
-    val keystoreFilePath = properties.getProperty("keystore.file", "").takeIf {
-      !(properties.getProperty("app.disable_signing")?.toBoolean() ?: false)
-    }
-
     val applicationName = getOrDefault(properties, "app.name", defaults)
     val applicationId = getOrDefault(properties, "app.id", defaults)
     val isExampleBuild = applicationId.matches(Regex(
@@ -43,7 +39,6 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
     ))
     val isExperimentalBuild =
       isExampleBuild ||
-      keystoreFilePath == null ||
       properties.getProperty("app.experimental", "false") == "true"
     val applicationExtension = getOrDefault(properties, "tgx.extension", defaults).also {
       require(it == "none" || it == "hms")
@@ -118,9 +113,7 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
       telegramApiHash =
         apiHash,
       safetyNetToken =
-        properties.getProperty("safetynet.api_key", "").takeIf {
-          keystoreFilePath != null
-        },
+        properties.getProperty("safetynet.api_key", ""),
       appDownloadUrl =
         getOrDefault(properties, "app.download_url", defaults),
       googlePlayUrl =
@@ -138,8 +131,6 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
       outputFileNamePrefix =
         properties.getProperty("app.file", null) ?:
         applicationName.replace(" ", "-").replace("#", ""),
-      keystorePropertiesPath =
-        keystoreFilePath,
 
       // version.properties
       applicationVersion =
