@@ -306,7 +306,6 @@ android {
 
     buildConfigString("PROJECT_NAME", config.applicationName)
     buildConfigBool("SHARED_STL", Config.SHARED_STL)
-    buildConfigString("SAFETYNET_API_KEY", config.safetyNetToken)
 
     buildConfigString("DOWNLOAD_URL", config.appDownloadUrl)
     buildConfigString("GOOGLE_PLAY_URL", config.googlePlayUrl)
@@ -720,23 +719,9 @@ android {
       }
       require(baseVersionCode != null && baseVersionName != null && fileName != null)
 
-      val recaptchaVersion = selectApiFlavor(
-        sdkVariant,
-        libs.google.recaptcha.legacy,
-        libs.google.recaptcha.lollipop,
-        libs.google.recaptcha.marshmallow,
-        libs.google.recaptcha.latest
-      )!!.get().version!!
-      require(recaptchaVersion.isNotEmpty() && recaptchaVersion.matches(Regex("^[0-9.]+$"))) {
-        "Invalid ReCaptcha version: $recaptchaVersion"
-      }
-
       variant.buildConfigFields!!.apply {
         put("ABI", BuildConfigField(
           "int", abi, null
-        ))
-        put("RECAPTCHA_VERSION", BuildConfigField(
-          "String", "\"$recaptchaVersion\"", null
         ))
         put("ORIGINAL_VERSION_CODE", BuildConfigField(
           "int", baseVersionCode, null
@@ -934,10 +919,6 @@ dependencies {
     libs.google.play.services.location.lollipop,
     libs.google.play.services.location.latest
   )
-  flavorImplementation(
-    libs.google.play.services.safetynet.legacy,
-    libs.google.play.services.safetynet.latest
-  )
   // ML Kit: https://developers.google.com/ml-kit/release-notes
   flavorImplementation(
     libs.google.play.services.mlkit.barcode.scanning.legacy,
@@ -957,20 +938,7 @@ dependencies {
     exclude(group = "com.google.firebase", module = "firebase-analytics")
     exclude(group = "com.google.firebase", module = "firebase-measurement-connector")
   }
-  // Play Integrity: https://developer.android.com/google/play/integrity/reference/com/google/android/play/core/release-notes
-  flavorImplementation(
-    libs.google.play.integrity.legacy,
-    libs.google.play.integrity.lollipop,
-    libs.google.play.integrity.latest
-  )
-  // ReCaptcha: https://cloud.google.com/recaptcha/docs/release-notes
-  flavorImplementation(
-    libs.google.recaptcha.legacy,
-    libs.google.recaptcha.lollipop,
-    libs.google.recaptcha.marshmallow,
-    libs.google.recaptcha.latest
-  )
-  // AndroidX/media: https://github.com/androidx/media/blob/release/RELEASENOTES.md
+   // AndroidX/media: https://github.com/androidx/media/blob/release/RELEASENOTES.md
   flavorImplementation(
     libs.androidx.media.common.legacy,
     libs.androidx.media.common.lollipop,

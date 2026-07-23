@@ -10,18 +10,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import com.google.android.gms.tasks.Task
-import com.google.android.recaptcha.Recaptcha
-import com.google.android.recaptcha.RecaptchaTasksClient
 import org.thunderdog.challegram.R
 import org.thunderdog.challegram.widget.SwirlView
 
 typealias Barcode = com.google.mlkit.vision.barcode.common.Barcode
 
 typealias TgxApplication = Application
-
-fun getRecaptchaTasksClient(application: Application, siteKey: String): Task<RecaptchaTasksClient> =
-  Recaptcha.fetchTaskClient(application, siteKey)
 
 fun registerReceiver(
   context: Context,
