@@ -27,7 +27,6 @@ object Config {
     "decoder_opus",
     "decoder_vp9"
   )
-
   val FFMPEG_LIBS = arrayOf(
     "swresample",
     "avformat",
@@ -136,17 +135,14 @@ enum class Abi(
   // do not change: multi-abi APKs intentionally share the same version code
   UNIVERSAL(0),
   ARM(0),
-  INTEL(0),
 
   ARMEABI_V7A(1),
-  ARM64_V8A(2),
-  X86(3),
-  X64(4);
+  ARM64_V8A(2);
 
   val isSingleAbi: Boolean
     get() =
       when (this) {
-        UNIVERSAL, ARM, INTEL -> false
+        UNIVERSAL, ARM -> false
         else -> true
       }
 
@@ -156,9 +152,7 @@ enum class Abi(
   companion object {
     val FILTERS = listOf(
       "arm64-v8a",
-      "armeabi-v7a",
-      "x86_64",
-      "x86"
+      "armeabi-v7a"
     )
 
     fun toFilters(abi: String): List<String> =
@@ -174,8 +168,6 @@ enum class Abi(
           when (abiFilter) {
             "arm64-v8a" -> abi == ARM64_V8A || abi == ARM || abi == UNIVERSAL
             "armeabi-v7a" -> abi == ARMEABI_V7A || abi == ARM || abi == UNIVERSAL
-            "x86_64" -> abi == X64 || abi == INTEL || abi == UNIVERSAL
-            "x86" -> abi == X86 || abi == INTEL || abi == UNIVERSAL
             else -> {
               fatal("Unknown abi argument: $abi")
             }
@@ -188,8 +180,6 @@ enum class Abi(
         when (abiFilters.size) {
           2 if abiFilters.containsAll(listOf("arm64-v8a", "armeabi-v7a")) ->
             ARM
-          2 if abiFilters.containsAll(listOf("x86", "x86_64")) ->
-            INTEL
           else ->
             UNIVERSAL
         }
@@ -201,11 +191,8 @@ enum class Abi(
       when (abiFilter) {
         "arm32", "armeabi-v7a" -> ARMEABI_V7A
         "arm64", "arm64-v8a" -> ARM64_V8A
-        "x86" -> X86
-        "x64", "x86_64" -> X64
         "all", "universal" -> UNIVERSAL
         "arm" -> ARM
-        "intel" -> INTEL
         else -> {
           fatal("Unknown abi filter: $abiFilter")
         }
