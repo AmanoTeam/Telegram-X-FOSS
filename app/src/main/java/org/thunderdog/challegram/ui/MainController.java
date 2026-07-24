@@ -1319,12 +1319,17 @@ public class MainController extends ViewPagerController<Void> implements Menu, M
     }
     tdlib.checkDeadlocks(() -> runOnUiThreadOptional(() -> {
       if (isFocused() && context.getActivityState() == UI.State.RESUMED) {
-        if (fromAppResume && !context().permissions().requestPostNotifications(granted -> {
-          if (granted) {
-            tdlib.notifications().onNotificationPermissionGranted();
-          }
-          syncContacts();
-        })) {
+        boolean requestedNotificationPermission = false;
+        if (fromAppResume && Settings.instance().needTutorial(Settings.TUTORIAL_NOTIFICATION_PERMISSION)) {
+          Settings.instance().markTutorialAsComplete(Settings.TUTORIAL_NOTIFICATION_PERMISSION);
+          requestedNotificationPermission = context().permissions().requestPostNotifications(granted -> {
+            if (granted) {
+              tdlib.notifications().onNotificationPermissionGranted();
+            }
+            syncContacts();
+          });
+        }
+        if (!requestedNotificationPermission) {
           syncContacts();
         }
       }
