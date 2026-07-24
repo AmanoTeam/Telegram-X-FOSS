@@ -55,7 +55,6 @@ import org.thunderdog.challegram.tool.Fonts;
 import org.thunderdog.challegram.tool.Strings;
 import org.thunderdog.challegram.tool.UI;
 import org.thunderdog.challegram.unsorted.Settings;
-import org.thunderdog.challegram.util.AppUpdater;
 import org.thunderdog.challegram.util.DrawableModifier;
 import org.thunderdog.challegram.util.Permissions;
 import org.thunderdog.challegram.util.StringList;
@@ -78,7 +77,7 @@ import me.vkryl.core.MathUtils;
 import me.vkryl.core.StringUtils;
 import me.vkryl.core.collection.IntList;
 
-public class SettingsThemeController extends RecyclerViewController<SettingsThemeController.Args> implements View.OnClickListener, ViewController.SettingsIntDelegate, SliderWrapView.RealTimeChangeListener, View.OnLongClickListener, AppUpdater.Listener {
+public class SettingsThemeController extends RecyclerViewController<SettingsThemeController.Args> implements View.OnClickListener, ViewController.SettingsIntDelegate, SliderWrapView.RealTimeChangeListener, View.OnLongClickListener {
   public SettingsThemeController (Context context, Tdlib tdlib) {
     super(context, tdlib);
   }
@@ -131,7 +130,6 @@ public class SettingsThemeController extends RecyclerViewController<SettingsThem
   public void destroy () {
     super.destroy();
     cancelLocationRequest();
-    context().appUpdater().removeListener(this);
   }
 
   private void cancelLocationRequest () {
@@ -314,56 +312,6 @@ public class SettingsThemeController extends RecyclerViewController<SettingsThem
           v.getToggler().setRadioEnabled(Settings.instance().needSendByEnter(), isUpdate);
         } else if (itemId == R.id.btn_toggleNewSetting) {
           updateSettingView(v, item, isUpdate);
-        } else if (itemId == R.id.btn_updateAutomatically) {
-          int mode = Settings.instance().getAutoUpdateMode();
-          v.getToggler().setRadioEnabled(mode != Settings.AUTO_UPDATE_MODE_NEVER, isUpdate);
-          switch (mode) {
-            case Settings.AUTO_UPDATE_MODE_NEVER:
-              v.setData(R.string.AutoUpdateNever);
-              break;
-            case Settings.AUTO_UPDATE_MODE_ALWAYS:
-              v.setData(R.string.AutoUpdateAlways);
-              break;
-            case Settings.AUTO_UPDATE_MODE_WIFI_ONLY:
-              v.setData(R.string.AutoUpdateWiFi);
-              break;
-            case Settings.AUTO_UPDATE_MODE_PROMPT:
-              v.setData(R.string.AutoUpdatePrompt);
-              break;
-          }
-        } else if (itemId == R.id.btn_checkUpdates) {
-          switch (context().appUpdater().state()) {
-            case AppUpdater.State.NONE: {
-              v.setEnabledAnimated(true, isUpdate);
-              v.setName(R.string.CheckForUpdates);
-              break;
-            }
-            case AppUpdater.State.CHECKING: {
-              v.setEnabledAnimated(false, isUpdate);
-              v.setName(R.string.CheckingForUpdates);
-              break;
-            }
-            case AppUpdater.State.AVAILABLE: {
-              v.setEnabledAnimated(true, isUpdate);
-              long bytesToDownload = context().appUpdater().totalBytesToDownload() - context().appUpdater().bytesDownloaded();
-              if (bytesToDownload > 0) {
-                v.setName(Lang.getStringBold(R.string.DownloadUpdateSize, Strings.buildSize(bytesToDownload)));
-              } else {
-                v.setName(R.string.DownloadUpdate);
-              }
-              break;
-            }
-            case AppUpdater.State.DOWNLOADING: {
-              v.setEnabledAnimated(false, isUpdate);
-              v.setName(Lang.getDownloadProgress(context().appUpdater().bytesDownloaded(), context().appUpdater().totalBytesToDownload(), true));
-              break;
-            }
-            case AppUpdater.State.READY_TO_INSTALL: {
-              v.setEnabledAnimated(true, isUpdate);
-              v.setName(R.string.InstallUpdate);
-              break;
-            }
-          }
         }
       }
     };
@@ -526,26 +474,12 @@ public class SettingsThemeController extends RecyclerViewController<SettingsThem
       }*/
       items.add(new ListItem(ListItem.TYPE_SHADOW_BOTTOM));
 
-      if (AppInstallationUtil.isAppSideLoaded(UI.getAppContext())) {
-        items.addAll(Arrays.asList(
-          new ListItem(ListItem.TYPE_HEADER, 0, 0, R.string.InAppUpdates),
-          new ListItem(ListItem.TYPE_SHADOW_TOP),
-          new ListItem(ListItem.TYPE_VALUED_SETTING_COMPACT_WITH_TOGGLER, R.id.btn_updateAutomatically, 0, R.string.AutoUpdate)
-        ));
-        if (Settings.instance().getAutoUpdateMode() != Settings.AUTO_UPDATE_MODE_NEVER) {
-          items.addAll(newAutoUpdateConfigurationItems());
-        }
-      } else {
-        items.addAll(Arrays.asList(
-          new ListItem(ListItem.TYPE_HEADER, 0, 0, R.string.AppUpdates),
-          new ListItem(ListItem.TYPE_SHADOW_TOP),
-          new ListItem(ListItem.TYPE_SETTING, R.id.btn_checkUpdates, 0, R.string.CheckForUpdates),
-          new ListItem(ListItem.TYPE_SEPARATOR_FULL),
-          new ListItem(ListItem.TYPE_SETTING, R.id.btn_subscribeToBeta, 0, R.string.SubscribeToBeta)
-        ));
-      }
+      items.addAll(Arrays.asList(
+        new ListItem(ListItem.TYPE_HEADER, 0, 0, R.string.AppUpdates),
+        new ListItem(ListItem.TYPE_SHADOW_TOP),
+        new ListItem(ListItem.TYPE_SETTING, R.id.btn_subscribeToBeta, 0, R.string.SubscribeToBeta)
+      ));
       items.add(new ListItem(ListItem.TYPE_SHADOW_BOTTOM));
-      context().appUpdater().addListener(this);
 
       items.add(new ListItem(ListItem.TYPE_HEADER, 0, 0, R.string.Chats));
       items.add(new ListItem(ListItem.TYPE_SHADOW_TOP));
@@ -692,24 +626,6 @@ public class SettingsThemeController extends RecyclerViewController<SettingsThem
     return items;
   }
 
-  @Override
-  public void onAppUpdateStateChanged (int state, int oldState, boolean isApk) {
-    if (oldState == AppUpdater.State.CHECKING && state == AppUpdater.State.NONE) {
-      // Slight delay
-      runOnUiThread(() ->
-        adapter.updateValuedSettingById(R.id.btn_checkUpdates),
-        250
-      );
-    } else {
-      adapter.updateValuedSettingById(R.id.btn_checkUpdates);
-    }
-  }
-
-  @Override
-  public void onAppUpdateDownloadProgress (long bytesDownloaded, long totalBytesToDownload) {
-    adapter.updateValuedSettingById(R.id.btn_checkUpdates);
-  }
-
   private static ListItem newCameraFlipInfoItem () {
     return new ListItem(ListItem.TYPE_DESCRIPTION, 0, 0, R.string.CameraFlipInfo);
   }
@@ -797,15 +713,6 @@ public class SettingsThemeController extends RecyclerViewController<SettingsThem
 
   private static ListItem newScheduleLocationItem () {
     return new ListItem(ListItem.TYPE_SETTING, R.id.btn_autoNightModeScheduled_location);
-  }
-
-  private static List<ListItem> newAutoUpdateConfigurationItems () {
-    return Arrays.asList(
-      new ListItem(ListItem.TYPE_SEPARATOR_FULL),
-      new ListItem(ListItem.TYPE_RADIO_SETTING, R.id.btn_toggleNewSetting, 0, R.string.InstallBetas).setLongId(Settings.SETTING_FLAG_DOWNLOAD_BETAS),
-      new ListItem(ListItem.TYPE_SEPARATOR_FULL),
-      new ListItem(ListItem.TYPE_SETTING, R.id.btn_checkUpdates, 0, R.string.CheckForUpdates)
-    );
   }
 
   @Override
@@ -1218,28 +1125,6 @@ public class SettingsThemeController extends RecyclerViewController<SettingsThem
       handleSettingClick(v, adapter);
     } else if (viewId == R.id.btn_subscribeToBeta) {
       tdlib.ui().subscribeToBeta(this);
-    } else if (viewId == R.id.btn_checkUpdates) {
-      switch (context().appUpdater().state()) {
-        case AppUpdater.State.NONE: {
-          context().appUpdater().checkForUpdates();
-          break;
-        }
-        case AppUpdater.State.CHECKING:
-        case AppUpdater.State.DOWNLOADING: {
-          // Do nothing.
-          break;
-        }
-        case AppUpdater.State.AVAILABLE: {
-          context().appUpdater().downloadUpdate();
-          break;
-        }
-        case AppUpdater.State.READY_TO_INSTALL: {
-          context().appUpdater().installUpdate();
-          break;
-        }
-      }
-    } else if (viewId == R.id.btn_updateAutomatically) {
-      showUpdateOptions();
     } else if (viewId == R.id.btn_saveToGallery) {
       Settings.instance().setSaveEditedMediaToGallery(adapter.toggleView(v));
     } else if (viewId == R.id.btn_mosaic) {
@@ -1338,40 +1223,6 @@ public class SettingsThemeController extends RecyclerViewController<SettingsThem
         return nameAttempt;
       }
     } while (true);
-  }
-
-  private void showUpdateOptions () {
-    int autoUpdateMode = Settings.instance().getAutoUpdateMode();
-    showSettings(new SettingsWrapBuilder(R.id.btn_updateAutomatically).setRawItems(new ListItem[] {
-      new ListItem(ListItem.TYPE_RADIO_OPTION, R.id.btn_updateAutomaticallyPrompt, 0, R.string.AutoUpdatePrompt, R.id.btn_updateAutomatically, autoUpdateMode == Settings.AUTO_UPDATE_MODE_PROMPT),
-      new ListItem(ListItem.TYPE_RADIO_OPTION, R.id.btn_updateAutomaticallyAlways, 0, R.string.AutoUpdateAlways, R.id.btn_updateAutomatically, autoUpdateMode == Settings.AUTO_UPDATE_MODE_ALWAYS),
-      new ListItem(ListItem.TYPE_RADIO_OPTION, R.id.btn_updateAutomaticallyWiFi, 0, R.string.AutoUpdateWiFi, R.id.btn_updateAutomatically, autoUpdateMode == Settings.AUTO_UPDATE_MODE_WIFI_ONLY),
-      new ListItem(ListItem.TYPE_RADIO_OPTION, R.id.btn_updateAutomaticallyNever, 0, R.string.AutoUpdateNever, R.id.btn_updateAutomatically, autoUpdateMode == Settings.AUTO_UPDATE_MODE_NEVER),
-    }).setAllowResize(false).setIntDelegate((id, result) -> {
-      int newAutoUpdateMode = Settings.instance().getAutoUpdateMode();
-      int autoUpdateResultId = result.get(R.id.btn_updateAutomatically);
-      boolean shouldChangeUi = (newAutoUpdateMode == Settings.AUTO_UPDATE_MODE_NEVER && autoUpdateResultId != R.id.btn_updateAutomaticallyNever) || (newAutoUpdateMode != Settings.AUTO_UPDATE_MODE_NEVER && autoUpdateResultId == R.id.btn_updateAutomaticallyNever);
-      if (autoUpdateResultId == R.id.btn_updateAutomaticallyAlways) {
-        newAutoUpdateMode = Settings.AUTO_UPDATE_MODE_ALWAYS;
-      } else if (autoUpdateResultId == R.id.btn_updateAutomaticallyWiFi) {
-        newAutoUpdateMode = Settings.AUTO_UPDATE_MODE_WIFI_ONLY;
-      } else if (autoUpdateResultId == R.id.btn_updateAutomaticallyPrompt) {
-        newAutoUpdateMode = Settings.AUTO_UPDATE_MODE_PROMPT;
-      } else if (autoUpdateResultId == R.id.btn_updateAutomaticallyNever) {
-        newAutoUpdateMode = Settings.AUTO_UPDATE_MODE_NEVER;
-      }
-      Settings.instance().setAutoUpdateMode(newAutoUpdateMode);
-      adapter.updateValuedSettingById(R.id.btn_updateAutomatically);
-
-      int index = adapter.indexOfViewById(R.id.btn_updateAutomatically);
-      if (shouldChangeUi && index != -1) {
-        if (newAutoUpdateMode == Settings.AUTO_UPDATE_MODE_NEVER) {
-          adapter.removeRange(index + 1, 4);
-        } else {
-          adapter.addItems(index + 1, newAutoUpdateConfigurationItems().toArray(new ListItem[0]));
-        }
-      }
-    }));
   }
 
   private void showThemeOptions (ListItem item) {
