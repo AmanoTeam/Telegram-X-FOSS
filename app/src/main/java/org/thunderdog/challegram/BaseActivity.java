@@ -132,7 +132,6 @@ import org.thunderdog.challegram.unsorted.AppState;
 import org.thunderdog.challegram.unsorted.Passcode;
 import org.thunderdog.challegram.unsorted.Settings;
 import org.thunderdog.challegram.util.ActivityPermissionResult;
-import org.thunderdog.challegram.util.AppUpdater;
 import org.thunderdog.challegram.util.KonfettiBuilder;
 import org.thunderdog.challegram.util.Permissions;
 import org.thunderdog.challegram.widget.BaseRootLayout;
@@ -195,10 +194,6 @@ public abstract class BaseActivity extends FragmentActivity implements View.OnTo
 
   public RecordAudioVideoController getRecordAudioVideoController () {
     return recordAudioVideoController;
-  }
-
-  public AppUpdater appUpdater () {
-    return appUpdater;
   }
 
   public NavigationController navigation () {
@@ -323,7 +318,6 @@ public abstract class BaseActivity extends FragmentActivity implements View.OnTo
 
   private RoundVideoController roundVideoController;
   private RecordAudioVideoController recordAudioVideoController;
-  private AppUpdater appUpdater;
 
   protected Tdlib tdlib;
 
@@ -470,7 +464,6 @@ public abstract class BaseActivity extends FragmentActivity implements View.OnTo
     AppState.initApplication();
     AppState.ensureReady();
 
-    appUpdater = new AppUpdater(this);
     roundVideoController = new RoundVideoController(this);
     recordAudioVideoController = new RecordAudioVideoController(this);
     invalidator = new Invalidator(this);
@@ -1170,7 +1163,6 @@ public abstract class BaseActivity extends FragmentActivity implements View.OnTo
         getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_SECURE);
       }
     }*/
-    appUpdater.checkForUpdates();
     runEmulatorChecks();
   }
 
@@ -2382,10 +2374,6 @@ public abstract class BaseActivity extends FragmentActivity implements View.OnTo
   protected void onActivityResult (int requestCode, int resultCode, Intent data) {
     // TODO rework to registerForActivityResult
     super.onActivityResult(requestCode, resultCode, data);
-    if (requestCode == Intents.ACTIVITY_RESULT_GOOGLE_PLAY_UPDATE) {
-      appUpdater.onGooglePlayFlowActivityResult(resultCode, data);
-      return;
-    }
     final int handlerIndex = activityResultHandlers.indexOfKey(requestCode);
     if (handlerIndex >= 0) {
       ActivityResultHandler handler = activityResultHandlers.valueAt(handlerIndex);

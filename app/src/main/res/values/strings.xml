@@ -4843,22 +4843,7 @@
   <string name="QualityBetter">Better quality</string>
   <string name="BiometricsError">System biometrics driver failure, see log for details.</string>
 
-  <string name="InAppUpdates">In-App Updates</string>
-  <string name="AppUpdates">App Updates</string>
-  <string name="AutoUpdate">Update automatically</string>
-  <string name="AutoUpdateNever">Never</string>
-  <string name="AutoUpdateAlways">Always</string>
-  <string name="AutoUpdateWiFi">On Wi-Fi</string>
-  <string name="AutoUpdatePrompt">Prompt when available</string>
-  <string name="InstallBetas">Install beta versions</string>
   <string name="CheckForUpdates">Check for updates</string>
-  <string name="InstallUpdate">Install an update</string>
-  <string name="CheckingForUpdates">Checking for updates…</string>
-  <string name="DownloadUpdateSize">Download update (%1$s)</string>
-  <string name="DownloadUpdate">Download update</string>
-  <string name="UpdateSourceChanges">View source code changes</string>
-  <string name="AppUpdateAvailablePrompt">A new **Telegram X** update is available. Would you like to download? (%1$s)</string>
-  <string name="AppUpdateAvailableVersionPrompt">A new **Telegram X** `%2$s` update is available. Would you like to download? (%1$s)</string>
 
   <string name="AppSignature">**Telegram X** `%1$s`</string>
 
