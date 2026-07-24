@@ -14,8 +14,6 @@ import org.thunderdog.challegram.R
 import org.thunderdog.challegram.widget.SwirlView
 import org.webrtc.ContextUtils;
 
-typealias Barcode = com.google.mlkit.vision.barcode.common.Barcode
-
 typealias TgxApplication = Application
 
 fun registerReceiver(

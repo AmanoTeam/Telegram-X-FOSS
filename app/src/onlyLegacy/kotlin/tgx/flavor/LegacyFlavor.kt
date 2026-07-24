@@ -12,8 +12,6 @@ import androidx.annotation.DrawableRes
 import androidx.multidex.MultiDexApplication
 import org.thunderdog.challegram.widget.SwirlView
 
-typealias Barcode = com.google.mlkit.vision.barcode.Barcode
-
 typealias TgxApplication = MultiDexApplication
 
 @Suppress("UnspecifiedRegisterReceiverFlag")
