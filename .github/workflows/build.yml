@@ -52,7 +52,7 @@ jobs:
       - name: Build
         run: |
           ./scripts/setup.sh --skip-sdk-setup
-          ./gradlew 'assembleLegacyUniversalRelease'
+          ./gradlew 'assembleLatestUniversalRelease'
       - name: Create logs
         if: always()
         run: |
