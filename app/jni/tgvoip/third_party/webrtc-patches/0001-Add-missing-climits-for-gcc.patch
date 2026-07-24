@@ -1,0 +1,12 @@
+diff --git a/pc/peer_connection.cc b/pc/peer_connection.cc
+index 76cf13a..dfd22e0 100644
+--- a/pc/peer_connection.cc
++++ b/pc/peer_connection.cc
+@@ -10,6 +10,7 @@
+ 
+ #include "pc/peer_connection.h"
+ 
++#include <climits>
+ #include <limits.h>
+ #include <stddef.h>
+ 
