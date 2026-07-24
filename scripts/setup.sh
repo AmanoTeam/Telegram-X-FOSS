@@ -18,6 +18,9 @@ fi
 
 patch-rlottie-and-opusfile-impl.sh
 
+# Patch missing standard-library includes required by gcc (stricter than clang)
+patch-gcc-includes-impl.sh
+
 # == Copy local.properties ===
 
 if [[ ! -f local.properties ]]; then
