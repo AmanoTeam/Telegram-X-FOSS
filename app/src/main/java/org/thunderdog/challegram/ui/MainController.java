@@ -1271,8 +1271,6 @@ public class MainController extends ViewPagerController<Void> implements Menu, M
     }
   }
 
-  private boolean notificationsRequested;
-
   private void showAnnoyingAlertsForCompliance (boolean fromAppResume) {
     if (Config.ENABLE_BASELINE_PROFILE_HOOKS) {
       addStartupMarker();
@@ -1282,16 +1280,17 @@ public class MainController extends ViewPagerController<Void> implements Menu, M
     }
     tdlib.checkDeadlocks(() -> runOnUiThreadOptional(() -> {
       if (isFocused() && context.getActivityState() == UI.State.RESUMED) {
-        boolean needNotifications = fromAppResume || !notificationsRequested;
-        if (needNotifications && !notificationsRequested) {
-          notificationsRequested = true;
+        boolean requestedNotificationPermission = false;
+        if (fromAppResume && Settings.instance().needTutorial(Settings.TUTORIAL_NOTIFICATION_PERMISSION)) {
+          Settings.instance().markTutorialAsComplete(Settings.TUTORIAL_NOTIFICATION_PERMISSION);
+          requestedNotificationPermission = context().permissions().requestPostNotifications(granted -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && granted) {
+              tdlib.notifications().onNotificationPermissionGranted();
+            }
+            syncContacts(null);
+          });
         }
-        if (needNotifications && !context().permissions().requestPostNotifications(granted -> {
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && granted) {
-            tdlib.notifications().onNotificationPermissionGranted();
-          }
-          syncContacts(null);
-        })) {
+        if (!requestedNotificationPermission) {
           syncContacts(null);
         }
       }
