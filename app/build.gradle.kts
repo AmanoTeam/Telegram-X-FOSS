@@ -919,15 +919,6 @@ dependencies {
     libs.google.play.services.location.lollipop,
     libs.google.play.services.location.latest
   )
-  // ML Kit: https://developers.google.com/ml-kit/release-notes
-  flavorImplementation(
-    libs.google.play.services.mlkit.barcode.scanning.legacy,
-    libs.google.play.services.mlkit.barcode.scanning.latest
-  )
-  flavorImplementation(
-    libs.google.mlkit.language.id.legacy,
-    libs.google.mlkit.language.id.latest
-  )
   // Firebase: https://firebase.google.com/support/release-notes/android
   flavorImplementation(
     libs.google.firebase.messaging.legacy,
@@ -938,7 +929,7 @@ dependencies {
     exclude(group = "com.google.firebase", module = "firebase-analytics")
     exclude(group = "com.google.firebase", module = "firebase-measurement-connector")
   }
-   // AndroidX/media: https://github.com/androidx/media/blob/release/RELEASENOTES.md
+  // AndroidX/media: https://github.com/androidx/media/blob/release/RELEASENOTES.md
   flavorImplementation(
     libs.androidx.media.common.legacy,
     libs.androidx.media.common.lollipop,
