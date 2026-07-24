@@ -16,11 +16,10 @@ package org.thunderdog.challegram
 
 import android.content.Context
 import androidx.work.Configuration
-import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import org.osmdroid.config.Configuration as OsmConfiguration
-import org.thunderdog.challegram.push.FirebaseDeviceTokenRetriever
+import org.thunderdog.challegram.push.NoPushDeviceTokenRetriever
 import org.thunderdog.challegram.service.PushHandler
 import org.thunderdog.challegram.telegram.TdlibManager
 import org.thunderdog.challegram.unsorted.AppContext
@@ -50,7 +49,7 @@ class BaseApplication : TgxApplication(), Configuration.Provider {
       },
       object : DeviceTokenRetrieverFactory {
         override fun onCreateNewTokenRetriever(context: Context): DeviceTokenRetriever {
-          val defaultTokenRetriever = FirebaseDeviceTokenRetriever()
+          val defaultTokenRetriever = NoPushDeviceTokenRetriever()
           val tokenRetriever = TelegramXExtension.createNewTokenRetriever(context)
           return tokenRetriever?.takeIf {
             !BuildConfig.EXPERIMENTAL && (
@@ -67,9 +66,6 @@ class BaseApplication : TgxApplication(), Configuration.Provider {
     if (!BuildConfig.EXPERIMENTAL) {
       val deviceTokenRetriever = DeviceTokenRetrieverInstance.get()
       TelegramXExtension.configure(this, deviceTokenRetriever)
-      if (deviceTokenRetriever !is FirebaseDeviceTokenRetriever) {
-        FirebaseMessaging.getInstance().isAutoInitEnabled = false
-      }
     }
   }
 

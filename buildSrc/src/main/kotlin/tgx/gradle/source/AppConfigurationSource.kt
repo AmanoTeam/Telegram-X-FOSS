@@ -87,8 +87,6 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
         isExperimentalBuild,
       isHuaweiBuild =
         applicationExtension == "hms",
-      googleServicesFile =
-        properties.getProperty("google_services.file", "").takeIf { it.isNotEmpty() },
       forceOptimize =
         properties.getProperty("app.forceoptimize")?.toBoolean() ?: false,
       doNotObfuscate =

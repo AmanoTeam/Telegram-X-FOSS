@@ -2,7 +2,6 @@
 
 plugins {
   id("java-toolchain-convention")
-  alias(libs.plugins.google.services) apply false
   alias(libs.plugins.androidx.baselineprofile) apply false
 }
 

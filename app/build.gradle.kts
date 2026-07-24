@@ -19,20 +19,6 @@ plugins {
 }
 
 val config = tgxConfig.config.get()
-val customGoogleServices = config.googleServicesFile?.let { rootDir.resolve(it) }
-val usedGoogleServices = customGoogleServices ?: file("google-services.json")
-if (customGoogleServices != null && !customGoogleServices.exists()) {
-  fatal("google_services.file: ${customGoogleServices.path} doesn't exist")
-}
-val hasFirebaseMessaging = (customGoogleServices != null || !config.isExperimentalBuild) &&
-  hasGoogleServicesClient(usedGoogleServices, config.applicationId)
-if (!hasFirebaseMessaging && customGoogleServices != null) {
-  val problem = "${customGoogleServices.path} has no client of ${config.applicationId}"
-  if (config.applicationId == "org.thunderdog.challegram") {
-    fatal("$problem: notifications in the app won't work")
-  }
-  logger.warn("$problem: pushes of Firebase are off")
-}
 val useLegacyPackaging = tgxConfig.useLegacyPackaging.get()
 val useLegacyNdk = tgxConfig.useLegacyNdk.get()
 val globalAbiFilters = tgxConfig.abiFilters.get()
@@ -139,14 +125,6 @@ val generateExceptions = tasks.register<GenerateExceptionsTask>("updateException
   kotlinOutputDir.set(layout.buildDirectory.dir(
     "generated/tgx/exceptions/kotlin"
   ))
-}
-val validateApiTokens = tasks.register<ValidateApiTokensTask>("validateApiTokens") {
-  group = "Setup"
-  description = "Validates some API tokens to make sure they work properly and won't cause problems"
-  applicationId.set(
-    config.applicationId
-  )
-  googleServicesJson.fileValue(usedGoogleServices)
 }
 val fetchLocalizedStrings = tasks.register<FetchLocalizedStringsTask>("fetchLocalizedStrings") {
   group = "Setup"
@@ -438,13 +416,6 @@ android {
     resValue("string", "AppName", config.applicationName)
     resValue("string", "account_type", "${config.applicationId}.sync.account")
     resValue("string", "content_authority", "${config.applicationId}.sync.provider")
-
-    if (hasFirebaseMessaging && customGoogleServices != null) {
-      googleServicesValues(customGoogleServices, config.applicationId).forEach { (name, value) ->
-        resValue("string", name, value)
-      }
-    }
-    buildConfigBool("FIREBASE_MESSAGING_ENABLED", hasFirebaseMessaging)
 
     buildConfigString("PROJECT_NAME", config.applicationName)
 
@@ -758,9 +729,6 @@ android {
 
   androidComponents {
     onVariants(selector().withBuildType("release")) { variant ->
-      if (!config.isExperimentalBuild) {
-        variant.lifecycleTasks.registerPreBuild(validateApiTokens)
-      }
       variant.sources.res?.addGeneratedSourceDirectory(
         fetchLocalizedStrings, FetchLocalizedStringsTask::resOutputDir
       )
@@ -1114,30 +1082,7 @@ dependencies {
     libs.androidx.camera.view.legacy,
     libs.androidx.camera.view.latest
   )
-  // Google Play Services: https://developers.google.com/android/guides/releases
-  flavorImplementation(
-    libs.google.play.services.base.legacy,
-    libs.google.play.services.base.lollipop,
-    libs.google.play.services.base.marshmallow,
-    libs.google.play.services.base.latest
-  )
-  flavorImplementation(
-    libs.google.play.services.basement.legacy,
-    libs.google.play.services.basement.lollipop,
-    libs.google.play.services.basement.marshmallow,
-    libs.google.play.services.basement.latest
-  )
-  // Firebase: https://firebase.google.com/support/release-notes/android
-  flavorImplementation(
-    libs.google.firebase.messaging.legacy,
-    libs.google.firebase.messaging.lollipop,
-    libs.google.firebase.messaging.marshmallow,
-    libs.google.firebase.messaging.latest
-  ) {
-    exclude(group = "com.google.firebase", module = "firebase-core")
-    exclude(group = "com.google.firebase", module = "firebase-analytics")
-    exclude(group = "com.google.firebase", module = "firebase-measurement-connector")
-  }
+  // AndroidX/media: https://github.com/androidx/media/blob/release/RELEASENOTES.md
   // AndroidX/media: https://github.com/androidx/media/blob/release/RELEASENOTES.md
   flavorImplementation(
     libs.androidx.media.common.legacy,
@@ -1215,11 +1160,6 @@ dependencies {
   }
 }
 
-if (!config.isExperimentalBuild) {
-  if (customGoogleServices == null) {
-    apply(plugin = libs.plugins.google.services.get().pluginId)
-  }
-  if (config.isHuaweiBuild) {
-    apply(plugin = libs.huawei.agconnect.get().group)
-  }
+if (config.isHuaweiBuild) {
+  apply(plugin = libs.huawei.agconnect.get().group)
 }

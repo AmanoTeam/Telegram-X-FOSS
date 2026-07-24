@@ -91,7 +91,6 @@ data class ApplicationConfig(
 
   val isExperimentalBuild: Boolean,
   val isHuaweiBuild: Boolean,
-  val googleServicesFile: String?,
   val forceOptimize: Boolean,
   val doNotObfuscate: Boolean,
   val build: BuildVersions,
