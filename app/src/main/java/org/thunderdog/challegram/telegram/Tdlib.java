@@ -5977,8 +5977,6 @@ public class Tdlib implements TdlibProvider, Settings.SettingsChangeListener, Da
     String safetyNetApiKey = safetyNetApiKey();
     if (StringUtils.isEmpty(safetyNetApiKey)) {
       TDLib.Tag.safetyNet("Ignoring Firebase authentication, because SafetyNet API_KEY is unset");
-    } else if (Config.REQUIRE_FIREBASE_SERVICES_FOR_SAFETYNET && !U.isGooglePlayServicesAvailable(context)) {
-      TDLib.Tag.safetyNet("Ignoring Firebase authentication, because Firebase services are unavailable");
     } else {
       TDLib.Tag.safetyNet("Enabling Firebase authentication for the next request");
       firebaseAuthenticationSettings = new TdApi.FirebaseAuthenticationSettingsAndroid();
