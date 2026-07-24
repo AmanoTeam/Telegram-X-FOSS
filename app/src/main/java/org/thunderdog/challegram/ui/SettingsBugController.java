@@ -58,7 +58,6 @@ import org.thunderdog.challegram.tool.UI;
 import org.thunderdog.challegram.ui.camera.CameraController;
 import org.thunderdog.challegram.unsorted.Settings;
 import org.thunderdog.challegram.unsorted.Test;
-import org.thunderdog.challegram.util.AppUpdater;
 import org.thunderdog.challegram.util.Crash;
 import org.thunderdog.challegram.util.StringList;
 import org.thunderdog.challegram.v.CustomRecyclerView;
@@ -76,6 +75,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import me.vkryl.android.AppInstallationUtil;
 import me.vkryl.core.MathUtils;
 import me.vkryl.core.StringUtils;
 import me.vkryl.core.collection.IntList;
@@ -396,7 +396,13 @@ public class SettingsBugController extends RecyclerViewController<SettingsBugCon
       default:
         return null;
     }
-    return Lang.getMarkdownStringSecure(this, resId, getDiskAvailableInfo(), AppUpdater.getDownloadUrl(null).url);
+    return Lang.getMarkdownStringSecure(this, resId, getDiskAvailableInfo(), new AppInstallationUtil.PublicMarketUrls(
+      BuildConfig.DOWNLOAD_URL,
+      BuildConfig.GOOGLE_PLAY_URL,
+      BuildConfig.GALAXY_STORE_URL,
+      BuildConfig.HUAWEI_APPGALLERY_URL,
+      BuildConfig.AMAZON_APPSTORE_URL
+    ).toDownloadUrl(AppInstallationUtil.getInstallerId(UI.getAppContext()), null).url);
   }
 
   @Override

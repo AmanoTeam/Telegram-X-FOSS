@@ -40,7 +40,6 @@ import org.thunderdog.challegram.data.TD;
 import org.thunderdog.challegram.loader.ImageFile;
 import org.thunderdog.challegram.tool.Strings;
 import org.thunderdog.challegram.tool.UI;
-import org.thunderdog.challegram.util.AppUpdater;
 import org.thunderdog.challegram.util.DrawableProvider;
 import org.thunderdog.challegram.util.text.Letters;
 import org.thunderdog.challegram.voip.annotation.CallState;
@@ -279,7 +278,13 @@ public class TdlibCache implements LiveLocationManager.OutputDelegate, CleanupSt
     if (!StringUtils.isEmpty(httpUrl) && tdlib.hasUrgentInAppUpdate()) {
       return new AppInstallationUtil.DownloadUrl(httpUrl);
     }
-    return AppUpdater.getDownloadUrl(httpUrl);
+    return new AppInstallationUtil.PublicMarketUrls(
+      BuildConfig.DOWNLOAD_URL,
+      BuildConfig.GOOGLE_PLAY_URL,
+      BuildConfig.GALAXY_STORE_URL,
+      BuildConfig.HUAWEI_APPGALLERY_URL,
+      BuildConfig.AMAZON_APPSTORE_URL
+    ).toDownloadUrl(AppInstallationUtil.getInstallerId(UI.getAppContext()), httpUrl);
   }
 
   public void getDownloadUrl (@Nullable final RunnableData<AppInstallationUtil.DownloadUrl> callback) {

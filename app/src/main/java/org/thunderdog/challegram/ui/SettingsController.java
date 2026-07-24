@@ -76,7 +76,6 @@ import org.thunderdog.challegram.tool.Views;
 import org.thunderdog.challegram.unsorted.Settings;
 import org.thunderdog.challegram.unsorted.Size;
 import org.thunderdog.challegram.util.AppBuildInfo;
-import org.thunderdog.challegram.util.AppUpdater;
 import org.thunderdog.challegram.util.OptionDelegate;
 import org.thunderdog.challegram.util.PullRequest;
 import org.thunderdog.challegram.util.StringList;
@@ -661,7 +660,13 @@ public class SettingsController extends ViewController<Void> implements
     items.add(new ListItem(ListItem.TYPE_SHADOW_BOTTOM));
 
     items.add(new ListItem(ListItem.TYPE_SHADOW_TOP));
-    AppInstallationUtil.DownloadUrl downloadUrl = AppUpdater.getDownloadUrl(null);
+    AppInstallationUtil.DownloadUrl downloadUrl = new AppInstallationUtil.PublicMarketUrls(
+      BuildConfig.DOWNLOAD_URL,
+      BuildConfig.GOOGLE_PLAY_URL,
+      BuildConfig.GALAXY_STORE_URL,
+      BuildConfig.HUAWEI_APPGALLERY_URL,
+      BuildConfig.AMAZON_APPSTORE_URL
+    ).toDownloadUrl(AppInstallationUtil.getInstallerId(UI.getAppContext()), null);
     @DrawableRes int downloadIconRes;
     @StringRes int downloadStringRes = R.string.CheckForUpdates;
     if (tdlib.hasUrgentInAppUpdate() && tdlib.isProduction()) {
