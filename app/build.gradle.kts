@@ -100,16 +100,6 @@ val generateExceptions = tasks.register<GenerateExceptionsTask>("updateException
     "generated/tgx/exceptions/java"
   ))
 }
-val validateApiTokens = tasks.register<ValidateApiTokensTask>("validateApiTokens") {
-  group = "Setup"
-  description = "Validates some API tokens to make sure they work properly and won't cause problems"
-  applicationId.set(
-    config.applicationId
-  )
-  googleServicesJson.set(layout.projectDirectory.file(
-    "google-services.json"
-  ))
-}
 val fetchLocalizedStrings = tasks.register<FetchLocalizedStringsTask>("fetchLocalizedStrings") {
   group = "Setup"
   description = "Generates and updates all strings.xml resources based on translations.telegram.org"
@@ -631,9 +621,6 @@ android {
 
   androidComponents {
     onVariants(selector().withBuildType("release")) { variant ->
-      if (!config.isExperimentalBuild) {
-        variant.lifecycleTasks.registerPreBuild(validateApiTokens)
-      }
       variant.sources.res?.addGeneratedSourceDirectory(
         fetchLocalizedStrings, FetchLocalizedStringsTask::resOutputDir
       )
@@ -926,27 +913,6 @@ dependencies {
     libs.androidx.camera.view.legacy,
     libs.androidx.camera.view.latest
   )
-  // Google Play Services: https://developers.google.com/android/guides/releases
-  flavorImplementation(
-    libs.google.play.services.base.legacy,
-    libs.google.play.services.base.lollipop,
-    libs.google.play.services.base.latest
-  )
-  flavorImplementation(
-    libs.google.play.services.basement.legacy,
-    libs.google.play.services.basement.lollipop,
-    libs.google.play.services.basement.latest
-  )
-  // Firebase: https://firebase.google.com/support/release-notes/android
-  flavorImplementation(
-    libs.google.firebase.messaging.legacy,
-    libs.google.firebase.messaging.lollipop,
-    libs.google.firebase.messaging.latest
-  ) {
-    exclude(group = "com.google.firebase", module = "firebase-core")
-    exclude(group = "com.google.firebase", module = "firebase-analytics")
-    exclude(group = "com.google.firebase", module = "firebase-measurement-connector")
-  }
   // AndroidX/media: https://github.com/androidx/media/blob/release/RELEASENOTES.md
   flavorImplementation(
     libs.androidx.media.common.legacy,
@@ -1019,9 +985,6 @@ dependencies {
   compileOnly(libs.annotations.kotlin)
 }
 
-if (!config.isExperimentalBuild) {
-  apply(plugin = libs.plugins.google.services.get().pluginId)
-  if (config.isHuaweiBuild) {
-    apply(plugin = libs.huawei.agconnect.get().group)
-  }
+if (config.isHuaweiBuild) {
+  apply(plugin = libs.huawei.agconnect.get().group)
 }
