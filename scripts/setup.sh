@@ -29,6 +29,9 @@ patch-androidx-media-impl.sh
 
 patch-rlottie-and-opusfile-impl.sh
 
+# Patch missing standard-library includes required by gcc (stricter than clang)
+patch-gcc-includes-impl.sh
+
 # Build and configure libvpx
 build-vpx-impl.sh
 

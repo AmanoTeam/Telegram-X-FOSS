@@ -1,0 +1,24 @@
+diff --git a/include/jni_as.h b/include/jni_as.h
+index 539799c..e63f002 100644
+--- a/include/jni_as.h
++++ b/include/jni_as.h
+@@ -13,6 +13,7 @@
+ #ifndef JNI_AS_H
+ #define JNI_AS_H
+ 
++#include <cstring>
+ #include <memory>
+ #include <type_traits>
+ 
+diff --git a/include/jni_utils.h b/include/jni_utils.h
+index 97cbb76..6e19b0e 100644
+--- a/include/jni_utils.h
++++ b/include/jni_utils.h
+@@ -10,6 +10,7 @@
+ #ifndef JNI_UTILS_H
+ #define JNI_UTILS_H
+ 
++#include <cstdint>
+ #include <jni.h>
+ #include <string>
+ #include <jni_as.h>
