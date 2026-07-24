@@ -1,0 +1,12 @@
+diff --git a/tgcalls/group/GroupInstanceReferenceImpl.cpp b/tgcalls/group/GroupInstanceReferenceImpl.cpp
+index 1557ce0..d66c897 100644
+--- a/tgcalls/group/GroupInstanceReferenceImpl.cpp
++++ b/tgcalls/group/GroupInstanceReferenceImpl.cpp
+@@ -47,6 +47,7 @@
+ #include <algorithm>
+ #include <cmath>
+ #include <map>
++#include <mutex>
+ #include <set>
+ #include <sstream>
+ 
