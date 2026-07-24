@@ -13,8 +13,6 @@ import androidx.core.content.ContextCompat
 import org.thunderdog.challegram.R
 import org.thunderdog.challegram.widget.SwirlView
 
-typealias Barcode = com.google.mlkit.vision.barcode.common.Barcode
-
 typealias TgxApplication = Application
 
 fun registerReceiver(

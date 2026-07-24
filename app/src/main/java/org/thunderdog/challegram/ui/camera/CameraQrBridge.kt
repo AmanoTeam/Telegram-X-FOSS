@@ -12,29 +12,18 @@
  */
 package org.thunderdog.challegram.ui.camera
 
-import android.graphics.ImageFormat
 import android.graphics.RectF
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.camera.core.ImageProxy
 import androidx.core.content.ContextCompat
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.mlkit.common.MlKitException
-import com.google.mlkit.vision.barcode.BarcodeScanner
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.common.InputImage
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.qrcode.QRCodeReader
 import com.google.zxing.qrcode.detector.FinderPattern
 import org.thunderdog.challegram.Log
 import org.thunderdog.challegram.U
-import org.thunderdog.challegram.tool.UI
 import org.thunderdog.challegram.ui.camera.legacy.CameraApiLegacy
-import org.thunderdog.challegram.unsorted.Settings
-import tgx.flavor.Barcode
 import java.nio.ByteBuffer
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
@@ -48,30 +37,9 @@ class CameraQrBridge(manager: CameraManager<*>) {
   private val delegate: CameraDelegate = manager.delegate
   private val mainExecutor: Executor = ContextCompat.getMainExecutor(manager.context)
   private val zxingReader = QRCodeReader()
-  private var barcodeScanner: BarcodeScanner? = null
-  private var mlkitFailed = false
-
-  init {
-    if (U.isGooglePlayServicesAvailable(UI.getAppContext()) && !Settings.instance().needForceZxingQrProcessing()) {
-      try {
-        barcodeScanner = BarcodeScanning.getClient(
-          BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-            .build()
-        )
-      } catch (e: Exception) {
-        Log.e(Log.TAG_CAMERA, e)
-      }
-    }
-  }
 
   fun destroy() {
-    barcodeScanner?.apply {
-      close()
-    }?.also {
-      barcodeScanner = null
-    }
     backgroundExecutor.shutdown()
-    mlkitFailed = false
   }
 
   @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -80,22 +48,11 @@ class CameraQrBridge(manager: CameraManager<*>) {
     proxy.use {
       val mediaImage = it.image
       if (mediaImage != null) {
-        if (this.isGmsImplementationSupported) {
-          gmsImplementation(
-            InputImage.fromMediaImage(
-              mediaImage,
-              proxy.imageInfo.rotationDegrees
-            ),
-            bufferAsBytes(proxy.planes[0].buffer),
-            U.isRotated(proxy.imageInfo.rotationDegrees)) {
-          }
-        } else {
-          zxingImplementation(
-            bufferAsBytes(proxy.planes[0].buffer),
-            proxy.width,
-            proxy.height,
-            proxy.imageInfo.rotationDegrees) {
-          }
+        zxingImplementation(
+          bufferAsBytes(proxy.planes[0].buffer),
+          proxy.width,
+          proxy.height,
+          proxy.imageInfo.rotationDegrees) {
         }
       }
     }
@@ -109,81 +66,12 @@ class CameraQrBridge(manager: CameraManager<*>) {
   ) {
     val rotation = delegate.getCurrentCameraOrientation()
 
-    if (this.isGmsImplementationSupported) {
-      gmsImplementation(
-        InputImage.fromByteArray(
-          data,
-          previewWidth,
-          previewHeight,
-          rotation,
-          ImageFormat.NV21
-        ), data, U.isRotated(rotation)) {
-        legacyApi.notifyCanReadNextFrame()
-      }
-    } else {
-      zxingImplementation(
-        data,
-        previewWidth,
-        previewHeight,
-        rotation) {
-        legacyApi.notifyCanReadNextFrame()
-      }
-    }
-  }
-
-  val isGmsImplementationSupported: Boolean
-    get() = barcodeScanner != null && !mlkitFailed
-
-  private fun gmsImplementation(
-    image: InputImage,
-    safeData: ByteArray,
-    swapSizes: Boolean,
-    onCompleteListener: (() -> Unit)?
-  ) {
-    barcodeScanner!!.process(image).addOnSuccessListener(
-      mainExecutor,
-      OnSuccessListener { barcodes: MutableList<Barcode?>? ->
-        if (barcodes!!.isEmpty()) {
-          delegate.onQrCodeNotFound()
-        } else {
-          val first: Barcode = barcodes[0]!!
-
-          if (swapSizes) {
-            delegate.onQrCodeFound(
-              first.rawValue,
-              RectF(first.boundingBox),
-              image.width,
-              image.height,
-              0,
-              false
-            )
-          } else {
-            delegate.onQrCodeFound(
-              first.rawValue,
-              RectF(first.boundingBox),
-              image.height,
-              image.width,
-              0,
-              false
-            )
-          }
-        }
-      }).addOnFailureListener(OnFailureListener { ex: Exception? ->
-      if (ex is MlKitException) {
-        //Log.w("MlkitException - reverting to ZXing [code: %s, msg: %s]", ((MlKitException) ex).getErrorCode(), ex.getMessage());
-        mlkitFailed = true
-        zxingImplementation(
-          safeData,
-          image.width,
-          image.height,
-          image.rotationDegrees,
-          onCompleteListener
-        )
-      } else {
-        Log.e(Log.TAG_CAMERA, ex)
-      }
-    }).addOnCompleteListener { result ->
-      if (onCompleteListener != null) onCompleteListener()
+    zxingImplementation(
+      data,
+      previewWidth,
+      previewHeight,
+      rotation) {
+      legacyApi.notifyCanReadNextFrame()
     }
   }
 
