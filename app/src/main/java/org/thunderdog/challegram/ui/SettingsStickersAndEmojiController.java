@@ -265,9 +265,6 @@ public class SettingsStickersAndEmojiController extends RecyclerViewController<S
       if (item.getBoolValue())
         value = !value;
       Settings.instance().setNewSetting(item.getLongId(), value);
-      if (value && item.getLongId() == Settings.SETTING_FLAG_DOWNLOAD_BETAS) {
-        context().appUpdater().checkForUpdates();
-      }
     } else if (viewId == R.id.btn_stickerSettings) {
       SettingsStickersController c = new SettingsStickersController(context, tdlib, SettingsStickersController.TYPE_STICKER);
       c.setArguments(getArguments());

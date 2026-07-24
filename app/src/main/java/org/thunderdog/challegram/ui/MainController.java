@@ -121,7 +121,6 @@ import org.thunderdog.challegram.tool.Views;
 import org.thunderdog.challegram.unsorted.Passcode;
 import org.thunderdog.challegram.unsorted.Settings;
 import org.thunderdog.challegram.unsorted.Test;
-import org.thunderdog.challegram.util.AppUpdater;
 import org.thunderdog.challegram.util.FeatureAvailability;
 import org.thunderdog.challegram.util.StringList;
 import org.thunderdog.challegram.util.text.Counter;
@@ -163,7 +162,7 @@ import tgx.td.ChatPosition;
 import tgx.td.Td;
 import tgx.td.TdConstants;
 
-public class MainController extends ViewPagerController<Void> implements Menu, MoreDelegate, OverlayButtonWrap.Callback, TdlibOptionListener, AppUpdater.Listener, ChatFoldersListener, GlobalCountersListener, Settings.ChatFolderSettingsListener {
+public class MainController extends ViewPagerController<Void> implements Menu, MoreDelegate, OverlayButtonWrap.Callback, TdlibOptionListener, ChatFoldersListener, GlobalCountersListener, Settings.ChatFolderSettingsListener {
   private static final long MAIN_PAGER_ITEM_ID = Long.MIN_VALUE;
   private static final long ARCHIVE_PAGER_ITEM_ID = Long.MIN_VALUE + 1;
   private static final long INVALID_PAGER_ITEM_ID = Long.MAX_VALUE;
@@ -194,14 +193,13 @@ public class MainController extends ViewPagerController<Void> implements Menu, M
     if (composeWrap != null) {
       checkComposeWrapPaddings();
     }
-    Views.setPaddingBottom(updateSnackBar, extraBottomInsetWithoutIme);
     updateBottomBarMargins();
     checkMargins();
   }
 
   private void updateBottomBarMargins () {
     if (bottomBar != null) {
-      int height = Math.round(extraBottomInsetWithoutIme * (1f - (updateSnackBar != null ? updateSnackBar.getVisibilityFactor() : 0)));
+      int height = Math.round(extraBottomInsetWithoutIme);
       Views.setBottomMargin(bottomBar, height);
       bottomBarSpace.setLayoutHeight(height, true);
     }
@@ -372,11 +370,6 @@ public class MainController extends ViewPagerController<Void> implements Menu, M
 
     checkTabs();
     checkMargins();
-
-    context().appUpdater().addListener(this);
-    if (context().appUpdater().state() == AppUpdater.State.READY_TO_INSTALL) {
-      onAppUpdateAvailable(context().appUpdater().flowType() == AppUpdater.FlowType.TELEGRAM_CHANNEL, true);
-    }
   }
 
   @Override
@@ -1022,7 +1015,7 @@ public class MainController extends ViewPagerController<Void> implements Menu, M
   private void checkPagerMargins () {
     if (!Config.CHAT_FOLDERS_HIDE_BOTTOM_BAR_ON_SCROLL && displayTabsAtBottom()) {
       Views.setBottomMargin(getViewPager(), getHeaderHeight());
-      Views.setBottomMargin(pagerWrap, updateSnackBar != null ? Math.round(updateSnackBar.getHeight() * updateSnackBar.getVisibilityFactor()) : 0); // FIXME
+      Views.setBottomMargin(pagerWrap, 0); // FIXME
     } else {
       Views.setBottomMargin(getViewPager(), 0);
       Views.setBottomMargin(pagerWrap, 0);
@@ -1064,66 +1057,10 @@ public class MainController extends ViewPagerController<Void> implements Menu, M
     }
   }
 
-  private SnackBar updateSnackBar;
-
-  private void onAppUpdateAvailable (boolean isApk, boolean immediate) {
-    if (updateSnackBar == null) {
-      updateSnackBar = new SnackBar(context);
-      Views.setPaddingBottom(updateSnackBar, extraBottomInsetWithoutIme);
-      updateSnackBar.setCallback(new SnackBar.Callback() {
-        @Override
-        public void onSnackBarTransition (SnackBar v, float factor) {
-          float offsetBySnackBar = v.getMeasuredHeight() * factor;
-          composeWrap.setTranslationY(-offsetBySnackBar);
-          boolean tabsAtBottom = displayTabsAtBottom();
-          if (Config.CHAT_FOLDERS_HIDE_BOTTOM_BAR_ON_SCROLL) {
-            bottomBarOffsetBySnackBar = -offsetBySnackBar;
-            invalidateBottomBarOffset();
-          } else if (tabsAtBottom) {
-            Views.setBottomMargin(pagerWrap, Math.round(offsetBySnackBar)); // FIXME
-          }
-          if (tabsAtBottom) {
-            updateBottomBarMargins();
-          }
-        }
-
-        @Override
-        public void onDestroySnackBar (SnackBar v) {
-          if (Config.CHAT_FOLDERS_HIDE_BOTTOM_BAR_ON_SCROLL) {
-            bottomBarOffsetBySnackBar = 0;
-            invalidateBottomBarOffset();
-          } else {
-            Views.setBottomMargin(pagerWrap, 0); // FIXME
-          }
-          if (updateSnackBar == v) {
-            mainWrap.removeView(updateSnackBar);
-            updateSnackBar.removeThemeListeners(MainController.this);
-            updateSnackBar = null;
-          }
-        }
-      });
-      updateSnackBar.addThemeListeners(this);
-      updateSnackBar.setText(Lang.getString(R.string.AppUpdateReady));
-      mainWrap.addView(updateSnackBar);
-    }
-    updateSnackBar.setAction(Lang.getString(isApk ? R.string.AppUpdateInstall : R.string.AppUpdateRestart), context().appUpdater()::installUpdate, !isApk);
-    updateSnackBar.showSnackBar(!immediate && isFocused());
-  }
-
-  @Override
-  public void onAppUpdateStateChanged (int state, int oldState, boolean isApk) {
-    if (state == AppUpdater.State.READY_TO_INSTALL) {
-      onAppUpdateAvailable(isApk, false);
-    } else if (updateSnackBar != null) {
-      updateSnackBar.dismissSnackBar(isFocused());
-    }
-  }
-
   @Override
   public void destroy () {
     super.destroy();
     tdlib.listeners().removeOptionListener(this);
-    context().appUpdater().removeListener(this);
     tdlib.context().global().removeCountersListener(this);
     Settings.instance().removeChatFolderSettingsListener(this);
     tdlib.listeners().unsubscribeFromChatFoldersUpdates(this);
