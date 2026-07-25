@@ -52,8 +52,8 @@ fun loadLibraries() {
     if (BuildConfig.SHARED_STL) {
       loadLibrary(reLinker, "c++_shared", BuildConfig.NDK_VERSION)
     }
-    loadLibrary(reLinker, "cryptox", BuildConfig.OPENSSL_VERSION_FULL)
-    loadLibrary(reLinker, "sslx", BuildConfig.OPENSSL_VERSION_FULL)
+    loadLibrary(reLinker, "cryptox", BuildConfig.LIBRESSL_VERSION)
+    loadLibrary(reLinker, "sslx", BuildConfig.LIBRESSL_VERSION)
     loadLibrary(reLinker, "tdjni", BuildConfig.TDLIB_VERSION)
     loadLibrary(reLinker, "leveldbjni", BuildConfig.LEVELDB_VERSION)
     if (BuildConfig.CALLS_AVAILABLE) {

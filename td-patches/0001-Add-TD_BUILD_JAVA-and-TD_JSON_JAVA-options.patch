@@ -1,0 +1,126 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 09e194a9d..62eebcbba 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -29,6 +29,8 @@ option(TD_INSTALL_STATIC_LIBRARIES "Enable installation of static libraries." ON
+ option(TD_INSTALL_SHARED_LIBRARIES "Enable installation of shared libraries." ON)
+ option(TD_ENABLE_JNI "Use \"ON\" to enable JNI-compatible TDLib API.")
+ option(TD_ENABLE_DOTNET "Use \"ON\" or \"CX\" to enable generation of C++/CLI or C++/CX TDLib API bindings respectively.")
++option(TD_BUILD_JAVA "Use \"ON\" to build Java JNI example (tdjni shared library, TdApi.java and Java example). Implies TD_ENABLE_JNI=ON.")
++option(TD_JSON_JAVA "Use \"ON\" to build Java wrapper for JSON API instead of the full API. Used only when TD_BUILD_JAVA is ON.")
+ if (NOT CMAKE_CROSSCOMPILING)
+   option(TD_GENERATE_SOURCE_FILES "Use \"ON\" to just generate TDLib source files.")
+ endif()
+@@ -1597,3 +1599,112 @@ install(FILES "TdConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/TdConfigVersion.cmak
+ 
+ # Add SOVERSION to shared libraries
+ set_property(TARGET tdjson PROPERTY SOVERSION "${TDLib_VERSION}")
++
++# Java JNI example, integrated from example/java/CMakeLists.txt
++if (TD_BUILD_JAVA)
++  if (NOT TD_ENABLE_JNI)
++    message(FATAL_ERROR "TD_BUILD_JAVA=ON requires TD_ENABLE_JNI=ON")
++  endif()
++
++  if (NOT ANDROID)
++    if (NOT JNI_FOUND)
++      find_package(JNI REQUIRED COMPONENTS JVM)
++    endif()
++    message(STATUS "Found JNI: ${JNI_INCLUDE_DIRS} ${JNI_LIBRARIES}")
++  endif()
++
++  if (NOT ANDROID)
++    if (NOT Java_FOUND)
++      find_package(Java REQUIRED)
++    endif()
++    message(STATUS "Found Java: ${Java_JAVAC_EXECUTABLE} ${Java_JAVADOC_EXECUTABLE}")
++  endif()
++
++  set(TD_API_JAVA_PACKAGE "org/drinkless/tdlib")
++  set(TD_JAVA_EXAMPLE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/example/java)
++  set(JAVA_SOURCE_PATH "${TD_JAVA_EXAMPLE_DIR}/${TD_API_JAVA_PACKAGE}")
++
++  set(TD_API_JAVA_TLO_PATH ${CMAKE_CURRENT_SOURCE_DIR}/td/generate/auto/tlo/td_api.tlo)
++  set(TD_API_JAVA_TL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/td/generate/scheme/td_api.tl)
++  set(JAVADOC_TL_DOCUMENTATION_GENERATOR_PATH ${CMAKE_CURRENT_SOURCE_DIR}/td/generate/JavadocTlDocumentationGenerator.php)
++
++  set(GENERATE_JAVA_API_CMD td_generate_java_api TdApi "${TD_API_JAVA_TLO_PATH}" "${TD_JAVA_EXAMPLE_DIR}" "${TD_API_JAVA_PACKAGE}")
++  if (PHP_EXECUTABLE)
++    set(GENERATE_JAVA_API_CMD ${GENERATE_JAVA_API_CMD} && ${PHP_EXECUTABLE} "${JAVADOC_TL_DOCUMENTATION_GENERATOR_PATH}" "${TD_API_JAVA_TL_PATH}" "${JAVA_SOURCE_PATH}/TdApi.java")
++  endif()
++
++  if (NOT ANDROID)
++    if (TD_JSON_JAVA)
++      add_custom_target(td_generate_java_api_files
++        COMMAND cmake -E echo ""
++        COMMENT "Skip generation of Java TDLib API source files"
++      )
++
++      set(JAVA_EXAMPLE_FILES "${JAVA_SOURCE_PATH}/example/JsonExample.java")
++      set(JAVA_SOURCE_FILES "${JAVA_SOURCE_PATH}/JsonClient.java")
++    else()
++      add_custom_target(td_generate_java_api_files
++        COMMAND ${GENERATE_JAVA_API_CMD}
++        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/td/generate/auto
++        COMMENT "Generating Java TDLib API source files"
++        DEPENDS td_generate_java_api tl_generate_tlo ${TD_API_JAVA_TL_PATH} ${JAVADOC_TL_DOCUMENTATION_GENERATOR_PATH}
++      )
++
++      set(JAVA_EXAMPLE_FILES "${JAVA_SOURCE_PATH}/example/Example.java")
++      set(JAVA_SOURCE_FILES "${JAVA_SOURCE_PATH}/Client.java" "${JAVA_SOURCE_PATH}/TdApi.java")
++    endif()
++
++    if (CMAKE_VERSION VERSION_LESS "3.17")
++      set(CMAKE_RM_COMMAND remove_directory)
++    else()
++      set(CMAKE_RM_COMMAND rm -rf --)
++    endif()
++
++    get_filename_component(JAVA_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin REALPATH BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
++    file(MAKE_DIRECTORY ${JAVA_OUTPUT_DIRECTORY})
++    add_custom_target(build_java
++      COMMAND ${CMAKE_COMMAND} -E ${CMAKE_RM_COMMAND} "${JAVA_OUTPUT_DIRECTORY}/${TD_API_JAVA_PACKAGE}"
++      COMMAND ${Java_JAVAC_EXECUTABLE} -encoding UTF-8 -d "${JAVA_OUTPUT_DIRECTORY}" ${JAVA_EXAMPLE_FILES} ${JAVA_SOURCE_FILES}
++      COMMENT "Building Java code"
++      DEPENDS td_generate_java_api_files
++    )
++
++    add_custom_target(generate_javadoc
++      COMMAND ${CMAKE_COMMAND} -E ${CMAKE_RM_COMMAND} "${JAVA_OUTPUT_DIRECTORY}/../docs"
++      COMMAND ${Java_JAVADOC_EXECUTABLE} -encoding UTF-8 -charset UTF-8 -d "${JAVA_OUTPUT_DIRECTORY}/../docs" ${JAVA_SOURCE_FILES}
++      COMMENT "Generating Javadoc documentation"
++      DEPENDS td_generate_java_api_files
++    )
++  endif()
++
++  # Building shared library
++  add_library(tdjni SHARED
++    ${TD_JAVA_EXAMPLE_DIR}/td_jni.cpp
++  )
++  if (NOT ANDROID)
++    target_include_directories(tdjni SYSTEM PRIVATE ${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2})
++    target_link_libraries(tdjni PRIVATE ${JAVA_JVM_LIBRARY})
++  endif()
++  target_compile_definitions(tdjni PRIVATE PACKAGE_NAME="${TD_API_JAVA_PACKAGE}")
++
++  if (TD_JSON_JAVA)
++    target_link_libraries(tdjni PRIVATE Td::TdJsonStatic)
++    target_compile_definitions(tdjni PRIVATE TD_JSON_JAVA=1)
++    set_target_properties(tdjni PROPERTIES OUTPUT_NAME "tdjsonjava")
++  else()
++    target_link_libraries(tdjni PRIVATE Td::TdStatic)
++  endif()
++
++  if (NOT ANDROID)
++    add_dependencies(tdjni td_generate_java_api_files build_java generate_javadoc)
++  endif()
++
++  install(TARGETS tdjni
++    LIBRARY DESTINATION "${CMAKE_INSTALL_BINDIR}"
++    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
++  )
++  if (MSVC AND VCPKG_TOOLCHAIN)
++    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/example/java/$<CONFIG>/" DESTINATION "${CMAKE_INSTALL_BINDIR}" FILES_MATCHING PATTERN "*.dll" PATTERN "*.pdb")
++  endif()
++endif()
++

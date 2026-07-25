@@ -30,7 +30,7 @@ val ndkMinSdkVersion = appliedNdkVersion.ndkVersionToMinSdk()
 
 val validateGitSetupTask = tasks.register<ValidateGitSetupTask>("validateGitSetup") {
   group = "Setup"
-  description = "Ensures git modules and LFS objects are fetched correctly"
+  description = "Ensures git modules are fetched correctly"
 
   mainDir.set(layout.projectDirectory.dir(".."))
   gitmodulesFile.set(layout.projectDirectory.file("../.gitmodules"))
@@ -40,19 +40,6 @@ val validateGitSetupTask = tasks.register<ValidateGitSetupTask>("validateGitSetu
     Regex("""^\s*path\s*=\s*(.+)$""", RegexOption.MULTILINE)
       .findAll(gitmodules).map { it.groupValues[1].trim() }.map { "../$it/.git" }.toList()
   })
-  lfsFiles.from(
-    layout.projectDirectory.dir(
-      "../tdlib/src/main/libs"
-    ).asFileTree.matching {
-      include("*/*/*/*.so")
-    },
-    layout.projectDirectory.dir(
-      "../tdlib/openssl"
-    ).asFileTree.matching {
-      include("*/*/*/lib/libcryptox.so")
-      include("*/*/*/lib/libsslx.so")
-    }
-  )
 }
 
 val generateThemes = tasks.register<GenerateThemesTask>("generateThemes") {
@@ -381,8 +368,10 @@ android {
     // Library versions in BuildConfig.java
 
     var tdlibVersion = ""
-    val tdlibCommit = requireFile(project.isolated.rootProject.projectDirectory.file("tdlib/version.txt").asFile).bufferedReader().readLine().take(7)
-    val tdlibVersionFile = requireFile(project.isolated.rootProject.projectDirectory.file("tdlib/source/td/CMakeLists.txt").asFile)
+    val tdlibCommit = providers.of(GitInformationSource::class) {
+      parameters.module = layout.projectDirectory.dir("../td")
+    }.get().commitHashShort
+    val tdlibVersionFile = File(project.rootDir.absoluteFile, "td/CMakeLists.txt")
     tdlibVersionFile.bufferedReader().use { reader ->
       val regex = Regex("^project\\(TDLib VERSION (\\d+\\.\\d+\\.\\d+) LANGUAGES CXX C\\)$")
       while (true) {
@@ -434,13 +423,11 @@ android {
       config.pullRequests.joinToString(", ") { "\"${it.author}\"" }
     }}")
 
-    // OpenSSL version
-
-    val openSslGit = providers.of(GitInformationSource::class) {
-      parameters.module = layout.projectDirectory.dir("../tdlib/source/openssl")
+    val libreSslGit = providers.of(GitInformationSource::class) {
+      parameters.module = layout.projectDirectory.dir("../libressl")
     }.get()
-    buildConfigString("OPENSSL_COMMIT", openSslGit.commitHashShort)
-    buildConfigString("OPENSSL_COMMIT_URL", openSslGit.commitUrl)
+    buildConfigString("LIBRESSL_COMMIT", libreSslGit.commitHashShort)
+    buildConfigString("LIBRESSL_COMMIT_URL", libreSslGit.commitUrl)
 
     // WebRTC version
 
@@ -819,36 +806,24 @@ android {
           "String", "\"$baseVersionName.$baseVersionCode\"", null
         ))
 
-        var openSslVersionFull = ""
-        var openSslReleaseDate = ""
-        val openSslVersionFile = requireFile(project.isolated.rootProject.projectDirectory.file("tdlib/openssl/${ndkVersion}/android-${sdkVariant.minSdk}/${abiVariant.filters.first()}/include/openssl/opensslv.h").asFile)
-        openSslVersionFile.bufferedReader().use { reader ->
-          val regex = Regex("^# define (OPENSSL_FULL_VERSION_STR|OPENSSL_RELEASE_DATE)\\s*\"([^\"]+)\"$")
+        var libreSslVersion = ""
+        val libreSslVersionFile = requireFile(project.isolated.rootProject.projectDirectory.file("libressl/patches/opensslv.h").asFile)
+        libreSslVersionFile.bufferedReader().use { reader ->
+          val regex = Regex("^#\\s*define\\s+LIBRESSL_VERSION_TEXT\\s+\"LibreSSL ([^\"]+)\"$")
           while (true) {
             val line = reader.readLine() ?: break
             val result = regex.find(line)
             if (result != null) {
-              val varName = result.groupValues[1]
-              val value = result.groupValues[2]
-              when (varName) {
-                "OPENSSL_FULL_VERSION_STR" -> openSslVersionFull = value
-                "OPENSSL_RELEASE_DATE" -> openSslReleaseDate = value
-                else -> error(varName)
-              }
-              if (openSslVersionFull.isNotEmpty() && openSslReleaseDate.isNotEmpty()) {
-                break
-              }
+              libreSslVersion = result.groupValues[1]
+              break
             }
           }
         }
-        if (openSslVersionFull.isEmpty()) {
-          fatal("OpenSSL not found!")
+        if (libreSslVersion.isEmpty()) {
+          fatal("LibreSSL not found!")
         }
-        put("OPENSSL_VERSION_FULL", BuildConfigField(
-          "String", "\"$openSslVersionFull\"", null
-        ))
-        put("OPENSSL_RELEASE_DATE", BuildConfigField(
-          "String", "\"$openSslReleaseDate\"", null
+        put("LIBRESSL_VERSION", BuildConfigField(
+          "String", "\"$libreSslVersion\"", null
         ))
       }
 
