@@ -158,3 +158,11 @@
 	url = https://github.com/TGX-Android/tlottie
 	shallow = true
 	branch = production
+[submodule "td"]
+	path = td
+	url = https://github.com/tdlib/td
+[submodule "libressl"]
+	path = libressl
+	url = https://github.com/libressl/portable
+	shallow = true
+	branch = master
