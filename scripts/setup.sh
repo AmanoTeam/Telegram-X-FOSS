@@ -38,6 +38,9 @@ patch-td-impl.sh
 # Patch libsrtp: use opaque HMAC_CTX / EVP_MD_CTX for LibreSSL 3.0+ (bundled copy is pinned to the legacy-API path)
 patch-libsrtp-impl.sh
 
+# Patch rnnoise: namespace its vendored celt DSP symbols so they no longer collide with opus's (changed) signatures at link time
+patch-rnnoise-impl.sh
+
 # Prebuild td: generate Java TDLib API sources (host build via TD_BUILD_JAVA)
 build-td-impl.sh
 
