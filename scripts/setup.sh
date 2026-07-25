@@ -21,6 +21,12 @@ patch-rlottie-and-opusfile-impl.sh
 # Patch missing standard-library includes required by gcc (stricter than clang)
 patch-gcc-includes-impl.sh
 
+# Patch td submodule: add TD_BUILD_JAVA / TD_JSON_JAVA options and Java JNI example build
+patch-td-impl.sh
+
+# Prebuild td: generate Java TDLib API sources (host build via TD_BUILD_JAVA)
+build-td-impl.sh
+
 # == Copy local.properties ===
 
 if [[ ! -f local.properties ]]; then
