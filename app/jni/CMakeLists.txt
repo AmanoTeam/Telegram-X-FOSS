@@ -19,7 +19,6 @@ include("${CMAKE_HOME_DIRECTORY}/cmake/Join.cmake")
 # == Dirs ==
 
 set(THIRDPARTY_DIR "${PROJECT_SOURCE_DIR}/third_party")
-set(TDLIB_DIR "${TGX_ROOT_DIR}/tdlib")
 set(UTILS_DIR "${THIRDPARTY_DIR}/jni-utils")
 
 set(ENABLE_TGVOIP yes)
@@ -57,30 +56,8 @@ add_compile_options(
 
 # == Libraries ==
 
-# tdjni
-
-add_library(crypto SHARED IMPORTED)
-set_target_properties(crypto PROPERTIES IMPORTED_LOCATION
-  ${TDLIB_DIR}/openssl/${ANDROID_NDK_REVISION}/${ANDROID_ABI}/lib/libcryptox.so
-)
-add_library(ssl SHARED IMPORTED)
-set_target_properties(ssl PROPERTIES IMPORTED_LOCATION
-  ${TDLIB_DIR}/openssl/${ANDROID_NDK_REVISION}/${ANDROID_ABI}/lib/libsslx.so
-)
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.11.0")
-  target_include_directories(crypto INTERFACE
-    ${TDLIB_DIR}/openssl/${ANDROID_NDK_REVISION}/${ANDROID_ABI}/include
-  )
-  target_include_directories(ssl INTERFACE
-    ${TDLIB_DIR}/openssl/${ANDROID_NDK_REVISION}/${ANDROID_ABI}/include
-  )
-endif()
-
-add_library(tdjni SHARED IMPORTED)
-set_target_properties(tdjni PROPERTIES IMPORTED_LOCATION
-  ${TDLIB_DIR}/src/main/libs/${ANDROID_NDK_REVISION}/${ANDROID_ABI}/libtdjni.so
-)
-target_link_libraries(tdjni INTERFACE crypto ssl)
+# tdjni (built from source via submodules/tdlib + submodules/libressl)
+include("${PROJECT_SOURCE_DIR}/BuildTd.cmake")
 
 # opus
 include("${PROJECT_SOURCE_DIR}/BuildOpus.cmake")

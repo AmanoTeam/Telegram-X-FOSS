@@ -138,3 +138,11 @@
 [submodule "app/jni/third_party/pixman"]
 	path = app/jni/third_party/pixman
 	url = https://gitlab.freedesktop.org/pixman/pixman.git
+[submodule "td"]
+	path = td
+	url = https://github.com/tdlib/td
+[submodule "libressl"]
+	path = libressl
+	url = https://github.com/libressl/portable
+	shallow = true
+	branch = master
