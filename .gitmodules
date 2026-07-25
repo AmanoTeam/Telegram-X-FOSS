@@ -138,3 +138,11 @@
 [submodule "thirdparty/androidx-media/marshmallow"]
 	path = thirdparty/androidx-media/marshmallow
 	url = https://github.com/androidx/media
+[submodule "td"]
+	path = td
+	url = https://github.com/tdlib/td
+[submodule "libressl"]
+	path = libressl
+	url = https://github.com/libressl/portable
+	shallow = true
+	branch = v4.3.2

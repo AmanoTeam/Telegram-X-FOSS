@@ -17,8 +17,8 @@ public class NLoader {
     if (BuildConfig.SHARED_STL) {
       System.loadLibrary("c++_shared");
     }
-    System.loadLibrary("cryptox");
-    System.loadLibrary("sslx");
+    System.loadLibrary("crypto");
+    System.loadLibrary("ssl");
     System.loadLibrary("tdjni");
     System.loadLibrary("leveldbjni");
     System.loadLibrary("tgcallsjni");

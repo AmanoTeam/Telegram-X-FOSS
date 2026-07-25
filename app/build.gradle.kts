@@ -92,8 +92,10 @@ android {
     // Library versions in BuildConfig.java
 
     var tdlibVersion = ""
-    val tdlibCommit = File(project.rootDir.absoluteFile, "tdlib/version.txt").bufferedReader().readLine().take(7)
-    val tdlibVersionFile = File(project.rootDir.absoluteFile, "tdlib/source/td/CMakeLists.txt")
+    val tdlibCommit = providers.of(GitVersionValueSource::class) {
+      parameters.module = layout.projectDirectory.dir("td")
+    }.get().commitHashShort
+    val tdlibVersionFile = File(project.rootDir.absoluteFile, "td/CMakeLists.txt")
     tdlibVersionFile.bufferedReader().use { reader ->
       val regex = Regex("^project\\(TDLib VERSION (\\d+\\.\\d+\\.\\d+) LANGUAGES CXX C\\)$")
       while (true) {
