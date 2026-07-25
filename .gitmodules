@@ -153,3 +153,11 @@
 	url = https://gitlab.freedesktop.org/pixman/pixman.git
 	shallow = true
 	branch = master
+[submodule "td"]
+	path = td
+	url = https://github.com/tdlib/td
+[submodule "libressl"]
+	path = libressl
+	url = https://github.com/libressl/portable
+	shallow = true
+	branch = master
