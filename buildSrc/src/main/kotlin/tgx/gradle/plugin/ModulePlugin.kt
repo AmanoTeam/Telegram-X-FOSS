@@ -163,9 +163,6 @@ open class ModulePlugin : Plugin<Project> {
                     getDefaultProguardFile(ProguardFiles.ProguardFile.OPTIMIZE.fileName),
                     "proguard-rules.pro"
                   )
-                  if (config.isHuaweiBuild) {
-                    proguardFile("proguard-hms.pro")
-                  }
                 }
               }
 
@@ -179,10 +176,6 @@ open class ModulePlugin : Plugin<Project> {
                   getDefaultProguardFile(ProguardFiles.ProguardFile.OPTIMIZE.fileName),
                   "proguard-rules.pro"
                 )
-
-                if (config.isHuaweiBuild) {
-                  proguardFile("proguard-hms.pro")
-                }
               }
             }
           }
@@ -221,9 +214,6 @@ open class ModulePlugin : Plugin<Project> {
                     getDefaultProguardFile(ProguardFiles.ProguardFile.OPTIMIZE.fileName),
                     "proguard-rules.pro"
                   )
-                  if (config.isHuaweiBuild) {
-                    proguardFile("proguard-hms.pro")
-                  }
                 }
               }
 
@@ -237,10 +227,6 @@ open class ModulePlugin : Plugin<Project> {
                   getDefaultProguardFile(ProguardFiles.ProguardFile.OPTIMIZE.fileName),
                   "proguard-rules.pro"
                 )
-
-                if (config.isHuaweiBuild) {
-                  proguardFile("proguard-hms.pro")
-                }
               }
             }
           }

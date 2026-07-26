@@ -16,9 +16,6 @@ androidx-interpolator = "1.0.0"
 
 google-zxing = "3.5.4"
 
-huawei-agcp = "1.9.6.300"
-huawei-hms = "6.13.0.301"
-
 shortcutbadger = "1.1.22"
 relinker = "1.4.5"
 konfetti = "2.0.5"
@@ -172,9 +169,6 @@ androidx-media-effect-latest = { module = "androidx.media3:media3-effect", versi
 google-zxing-core = { module = "com.google.zxing:core", version.ref = "google-zxing" }
 
 osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
-
-huawei-agconnect = { module = "com.huawei.agconnect:agcp", version.ref = "huawei-agcp" }
-huawei-hms = { module = "com.huawei.hms:push", version.ref = "huawei-hms" }
 
 okhttp-legacy = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp-legacy" }
 okhttp-latest = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp-latest" }
