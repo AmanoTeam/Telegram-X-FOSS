@@ -32,7 +32,7 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
     val isExampleBuild = false
     val isExperimentalBuild = false
     val applicationExtension = getOrDefault(properties, "tgx.extension", defaults).also {
-      require(it == "none" || it == "hms")
+      require(it == "none")
     }
 
     return ApplicationConfig(
@@ -49,8 +49,6 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
         properties.getProperty("app.sources_url", ""),
       isExperimentalBuild =
         isExperimentalBuild,
-      isHuaweiBuild =
-        applicationExtension == "hms",
       forceOptimize =
         properties.getProperty("app.forceoptimize")?.toBoolean() ?: false,
       doNotObfuscate =
