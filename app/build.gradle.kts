@@ -511,7 +511,6 @@ android {
 
         val selectedMinSdk = maxOf(
           variant.minSdk,
-          Config.MIN_SDK_VERSION_HUAWEI.takeIf { config.isHuaweiBuild } ?: 0,
           ndkMinSdkVersion
         )
         minSdk = selectedMinSdk
@@ -753,7 +752,7 @@ android {
         )
       }
 
-      if (!config.isHuaweiBuild && abiVariant.isUniversal) {
+      if (abiVariant.isUniversal) {
         variant.packaging.dex.useLegacyPackaging = true
         variant.packaging.jniLibs.useLegacyPackaging = true
       }
@@ -1043,8 +1042,4 @@ dependencies {
   compileOnly(libs.androidx.room.latest)
   compileOnly(libs.annotations.jsr305)
   compileOnly(libs.annotations.kotlin)
-}
-
-if (config.isHuaweiBuild) {
-  apply(plugin = libs.huawei.agconnect.get().group)
 }

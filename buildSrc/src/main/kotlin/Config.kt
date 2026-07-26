@@ -18,7 +18,6 @@ import java.util.*
 
 object Config {
   const val MIN_SDK_VERSION = 16
-  const val MIN_SDK_VERSION_HUAWEI = 17
   val JAVA_VERSION = org.gradle.api.JavaVersion.VERSION_25
   val ANDROIDX_MEDIA_EXTENSIONS = arrayOf(
     "decoder_ffmpeg",
@@ -87,7 +86,6 @@ data class ApplicationConfig(
   val majorVersion: Int,
 
   val isExperimentalBuild: Boolean,
-  val isHuaweiBuild: Boolean,
   val forceOptimize: Boolean,
   val doNotObfuscate: Boolean,
   val build: BuildVersions,
