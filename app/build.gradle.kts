@@ -235,14 +235,8 @@ android {
         dimension = "SDK"
         isDefault = sdkIndex == Sdk.MARSHMALLOW
 
-        val actualMinSdk = if (config.isHuaweiBuild) {
-          maxOf(variant.minSdk, Config.MIN_SDK_VERSION_HUAWEI)
-        } else {
-          variant.minSdk
-        }
-        val selectedMinSdk = maxOf(variant.minSdk, actualMinSdk)
-        minSdk = selectedMinSdk
-        if (selectedMinSdk < 21) {
+        minSdk = variant.minSdk
+        if (variant.minSdk < 21) {
           proguardFile("proguard-r8-bug-android-4.x-workaround.pro")
         }
 
@@ -258,7 +252,7 @@ android {
         externalNativeBuild.cmake {
           targets += arrayOf("tgxjni", "tgcallsjni")
           arguments(
-            "-DANDROID_PLATFORM=android-${selectedMinSdk}",
+            "-DANDROID_PLATFORM=android-${variant.minSdk}",
             "-DTGX_FLAVOR=${variant.flavor}",
             "-DANDROID_STL=${if (Config.SHARED_STL) "c++_shared" else "c++_static"}",
             "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON",
@@ -631,8 +625,4 @@ dependencies {
   compileOnly(libs.androidx.room.latest)
   compileOnly(libs.annotations.jsr305)
   compileOnly(libs.annotations.kotlin)
-}
-
-if (config.isHuaweiBuild) {
-  apply(plugin = libs.huawei.agconnect.get().group)
 }

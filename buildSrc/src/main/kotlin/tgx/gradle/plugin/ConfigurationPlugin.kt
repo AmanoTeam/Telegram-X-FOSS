@@ -41,10 +41,9 @@ open class ConfigurationPlugin : Plugin<Project> {
     val doNotObfuscate = isExampleBuild || properties.getProperty("app.dontobfuscate", "false") == "true"
     val forceOptimize = properties.getProperty("app.forceoptimize") == "true"
     val appExtension = getOrSample("tgx.extension")
-    if (appExtension != "none" && appExtension != "hms") {
+    if (appExtension != "none") {
       error("Unknown tgx.extension: $appExtension")
     }
-    val isHuaweiBuild = appExtension == "hms"
 
     val versions = loadProperties("version.properties")
 
@@ -85,7 +84,6 @@ open class ConfigurationPlugin : Plugin<Project> {
       applicationVersion,
       majorVersion,
       isExperimentalBuild,
-      isHuaweiBuild,
       forceOptimize,
       doNotObfuscate,
       compileSdkVersion,
