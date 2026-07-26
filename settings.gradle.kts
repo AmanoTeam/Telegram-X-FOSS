@@ -16,9 +16,6 @@ dependencyResolutionManagement {
     google()
     mavenCentral()
     maven(url = "https://jitpack.io")
-    if (extra["huawei"] == true) {
-      maven(url = "https://developer.huawei.com/repo/")
-    }
   }
 }
 

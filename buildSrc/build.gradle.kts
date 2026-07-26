@@ -76,10 +76,3 @@ dependencies {
     testImplementation(libs.bundles.unit.test)
   }
 }
-
-apply(from = "${rootDir.parentFile}/properties.gradle.kts")
-if (extra["huawei"] == true) {
-  dependencies {
-    implementation(libs.huawei.agconnect)
-  }
-}

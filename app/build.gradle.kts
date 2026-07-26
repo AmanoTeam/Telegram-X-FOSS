@@ -588,7 +588,6 @@ android {
 
         val selectedMinSdk = maxOf(
           variant.minSdk,
-          Config.MIN_SDK_VERSION_HUAWEI.takeIf { config.isHuaweiBuild } ?: 0,
           ndkMinSdkVersion
         )
         minSdk = selectedMinSdk
@@ -1132,8 +1131,4 @@ dependencies {
     testImplementation(libs.bundles.unit.test)
     androidTestImplementation(project(":tests:core"))
   }
-}
-
-if (config.isHuaweiBuild) {
-  apply(plugin = libs.huawei.agconnect.get().group)
 }
