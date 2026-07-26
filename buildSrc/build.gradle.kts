@@ -47,10 +47,3 @@ dependencies {
   implementation(libs.jgit)
   implementation(libs.jgit.lfs)
 }
-
-apply(from = "${rootDir.parentFile}/properties.gradle.kts")
-if (extra["huawei"] == true) {
-  dependencies {
-    implementation(libs.huawei.agconnect)
-  }
-}
