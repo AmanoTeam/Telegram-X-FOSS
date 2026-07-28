@@ -356,9 +356,6 @@ android {
         if (!sdkVariant.displayName.isNullOrEmpty()) {
           append("-${sdkVariant.displayName}")
         }
-        if (abiVariant.displayName != "universal" || (config.extension == "none" && sdkVariant.displayName.isNullOrEmpty())) {
-          append("-${abiVariant.displayName}")
-        }
         if (extra.has("app_name_suffix")) {
           append("-${extra["app_name_suffix"]}")
         }
