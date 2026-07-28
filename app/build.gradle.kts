@@ -754,9 +754,6 @@ android {
         if (variant.debuggable) {
           append("-debug")
         }
-        if (android.buildTypes.getByName(variant.buildType!!).signingConfig == null) {
-          append("-unsigned")
-        }
       }.toString()
 
       variant.outputs.forEach { output ->
@@ -771,22 +768,14 @@ android {
           sdk * 100 + abi.versionCode
         }
 
-        val abiSuffix = if (abi.isSingleAbi || (config.extension == "none" && sdkVariant.displayName.isNullOrEmpty())) {
-          "-${abi.toDisplayName()}"
-        } else {
-          ""
-        }
-
         val modifiedVersionCode = baseVersionCode * 1000 + flavorVersionCode
         output.versionCode.set(modifiedVersionCode)
 
         baseVersionName = output.versionName.get()
-        val modifiedVersionName = "$baseVersionName.$baseVersionCode$flavorVersionNameSuffix$abiSuffix$buildTypeSuffix"
+        val modifiedVersionName = "$baseVersionName.$baseVersionCode$flavorVersionNameSuffix$buildTypeSuffix"
         output.versionName.set(modifiedVersionName)
 
-        val cleanVersionName = modifiedVersionName.replace(Regex("-arm(?=-|$)"), "")
-
-        val fileName = "${config.outputFileNamePrefix}-${cleanVersionName}"
+        val fileName = "${config.outputFileNamePrefix}-${modifiedVersionName}"
         if (output is VariantOutputImpl) {
           output.outputFileName.set("$fileName.apk")
         }
