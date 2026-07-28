@@ -775,9 +775,6 @@ android {
         if (!sdkVariant.displayName.isNullOrEmpty()) {
           append("-${sdkVariant.displayName}")
         }
-        if (abiVariant.displayName != "universal" || (config.extension == "none" && sdkVariant.displayName.isNullOrEmpty())) {
-          append("-${abiVariant.displayName}")
-        }
         if (variant.debuggable) {
           append("-debug")
         }
