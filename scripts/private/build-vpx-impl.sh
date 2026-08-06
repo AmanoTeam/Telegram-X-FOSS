@@ -37,7 +37,7 @@ pushd "$THIRDPARTY_LIBRARIES/libvpx"
 # the function itself
 
 configure_abi() {
-  CFLAGS_="-DANDROID -O3 -fpic -fpie -ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden -fno-strict-aliasing -fomit-frame-pointer"
+  CFLAGS_="-DANDROID -fpic -fpie -ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden -fno-strict-aliasing -fomit-frame-pointer"
   LDFLAGS_=""
   case ${FLAVOR} in
     legacy)
@@ -75,7 +75,7 @@ configure_abi() {
       TARGET="armv7-android-gcc"
       EXTRA_PARAMS=(--enable-neon)
       NDK_ABIARCH="armv7a-linux-androideabi"
-      CFLAGS="${CFLAGS_} -march=armv7-a -mfloat-abi=softfp -mfpu=neon -mthumb -I${CPUFEATURES_DIR}"
+      CFLAGS="${CFLAGS_} -Os -march=armv7-a -mfloat-abi=softfp -mfpu=neon -mthumb -I${CPUFEATURES_DIR}"
       LDFLAGS="${LDFLAGS_}"
       ASFLAGS=""
       CPU=armv7-a

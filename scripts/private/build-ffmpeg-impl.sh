@@ -64,8 +64,8 @@ function build_one {
   --enable-small \
   --cross-prefix="$CROSS_PREFIX"- \
   --sysroot="$SYSROOT" \
-  --extra-cflags="-ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden -flto=full -fno-strict-aliasing -fno-fast-math -ftree-vectorize -funroll-loops -w -O2 -DCONFIG_LINUX_PERF=0 $OPTIMIZE_CFLAGS -I$LIBVPX_INCLUDE_DIR -fPIC" \
-  --extra-ldflags="-L$LIBVPX_LIB_DIR $EXTRA_LDFLAGS -lvpx -fPIC -flto=full" \
+  --extra-cflags="-ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden -fno-strict-aliasing -fno-fast-math -ftree-vectorize -funroll-loops -w -O2 -DCONFIG_LINUX_PERF=0 $OPTIMIZE_CFLAGS -I$LIBVPX_INCLUDE_DIR -fPIC" \
+  --extra-ldflags="-L$LIBVPX_LIB_DIR $EXTRA_LDFLAGS -lvpx -fPIC" \
   --extra-libs="$EXTRA_LIBS" \
   \
   --enable-version3 \
