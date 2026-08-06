@@ -56,7 +56,6 @@ abstract class BuildFfmpegTask : BuildNativeLibraryTask() {
       "-fvisibility-inlines-hidden",
       "-fno-strict-aliasing",
       "-fomit-frame-pointer",
-      "-flto=full",
       "-fno-fast-math",
       "-ftree-vectorize",
       "-funroll-loops",
@@ -77,8 +76,7 @@ abstract class BuildFfmpegTask : BuildNativeLibraryTask() {
         libvpx.resolve("lib")
       ).absolutePath}",
       "-lvpx",
-      "-fPIC",
-      "-flto=full"
+      "-fPIC"
     )
     val clangLibs by lazy {
       listOf("lib64/clang", "lib/clang").mapNotNull { base ->
