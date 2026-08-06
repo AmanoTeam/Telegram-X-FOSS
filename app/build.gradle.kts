@@ -486,7 +486,6 @@ android {
           "-ferror-limit=0",
           "-fno-exceptions",
 
-          "-O3",
           "-finline-functions"
         )
         externalNativeBuild.cmake {
