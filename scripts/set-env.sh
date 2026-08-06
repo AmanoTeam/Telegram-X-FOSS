@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-STYLE_END="$(tput sgr0)"
-STYLE_ERROR="$(tput bold)$(tput setaf 1)"
-STYLE_WARN="$(tput setaf 3)"
-STYLE_INFO="$(tput setaf 6)"
+STYLE_END=""
+STYLE_ERROR=""
+STYLE_WARN=""
+STYLE_INFO=""
 
 test -f version.properties || (echo -e "${STYLE_ERROR}You must call this script from the root folder.${STYLE_END}" && exit 1)
 
