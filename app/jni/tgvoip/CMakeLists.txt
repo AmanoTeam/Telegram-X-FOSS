@@ -185,7 +185,7 @@ target_link_libraries(${TGCALLS_LIB}
   cpufeatures
 )
 
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--gc-sections,--icf=safe -Wl,--build-id=none -Wl,--exclude-libs,ALL -flto")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--gc-sections,--icf=safe -Wl,--build-id=none -Wl,--exclude-libs,ALL")
 target_link_options(${TGCALLS_LIB} PRIVATE
   "-Wl,--exclude-libs,ALL"
   "-Wl,--gc-sections,--icf=safe"
@@ -193,7 +193,6 @@ target_link_options(${TGCALLS_LIB} PRIVATE
 target_compile_options(${TGCALLS_LIB} PRIVATE
   -fvisibility=hidden
   -fvisibility-inlines-hidden
-  -flto
 )
 
 if (${ANDROID_ABI} STREQUAL "arm64-v8a")

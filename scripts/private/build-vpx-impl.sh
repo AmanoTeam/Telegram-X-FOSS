@@ -63,7 +63,7 @@ configure_abi() {
       ANDROID_NDK_VERSION=$ANDROID_NDK_VERSION_PRIMARY
       TARGET="arm64-android-gcc"
       NDK_ABIARCH="aarch64-linux-android"
-      CFLAGS="${CFLAGS_} -O3 -march=armv8-a -I${CPUFEATURES_DIR}"
+      CFLAGS="${CFLAGS_} -march=armv8-a -I${CPUFEATURES_DIR}"
       LDFLAGS="${LDFLAGS_}"
       ASFLAGS=""
       CPU=arm64-v8a
