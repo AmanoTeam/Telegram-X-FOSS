@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         target: ['gcc', 'clang']
-        flavor: ['MarshmallowArm64', 'MarshmallowArm32']
+        flavor: ['MarshmallowArm64', 'MarshmallowArm32', 'Universal']
     steps:
       - uses: actions/checkout@main
         with:
