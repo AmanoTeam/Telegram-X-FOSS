@@ -1,0 +1,1 @@
+This is an unofficial FOSS-friendly fork of Telegram X, an alternative Telegram client based on TDLib, offering higher speed, smoother animations, and experimental features.
