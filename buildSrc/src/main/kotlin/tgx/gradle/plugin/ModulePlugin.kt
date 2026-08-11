@@ -6,6 +6,7 @@ import Sdk
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.TestExtension
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import com.android.build.gradle.ProguardFiles
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.Plugin
@@ -112,6 +113,11 @@ open class ModulePlugin : Plugin<Project> {
             Abi.VARIANTS.forEach { (_, variant) ->
               register(variant.flavor) {
                 dimension = "ABI"
+                ndkVersion = if (variant.is64Bit) {
+                  build.primaryNdkVersion
+                } else {
+                  build.legacyNdkVersion
+                }
                 ndk.abiFilters.addAll(variant.filters)
                 externalNativeBuild.ndkBuild.abiFilters(*variant.filters)
                 externalNativeBuild.cmake.abiFilters(*variant.filters)
@@ -135,6 +141,15 @@ open class ModulePlugin : Plugin<Project> {
                 }
               }
             }
+          }
+
+          project.extensions.getByType(LibraryAndroidComponentsExtension::class.java).beforeVariants { variantBuilder ->
+            val sdkFlavor = variantBuilder.productFlavors.first { it.first == "SDK" }.second
+            val sdkVariant = Sdk.VARIANTS.values.first { it.flavor == sdkFlavor }
+            val abiFlavor = variantBuilder.productFlavors.first { it.first == "ABI" }.second
+            val abiVariant = Abi.VARIANTS.values.first { it.flavor == abiFlavor }
+            variantBuilder.enable = sdkVariant.minSdk >= abiVariant.minSdk &&
+              (variantBuilder.buildType != "debug" || abiVariant.flavor == "universal")
           }
         }
 
