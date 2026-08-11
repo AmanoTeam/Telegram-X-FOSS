@@ -1,5 +1,6 @@
 package tgx.gradle.plugin
 
+import Abi
 import ApplicationConfig
 import Config
 import Sdk
@@ -18,17 +19,20 @@ import tgx.gradle.findExtraFolders
 import tgx.gradle.getIntOrThrow
 import tgx.gradle.getOrThrow
 import tgx.gradle.loadProperties
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 
 private data class Versions(
   val compileSdk: Int,
   val buildTools: String,
   val legacyNdk: String,
+  val primaryNdk: String,
   val targetSdk: Int,
 ) {
   constructor(config: ApplicationConfig) : this(
     compileSdk = config.compileSdkVersion,
     buildTools = config.buildToolsVersion,
     legacyNdk = config.legacyNdkVersion,
+    primaryNdk = config.primaryNdkVersion,
     targetSdk = config.targetSdkVersion
   )
 }
@@ -48,7 +52,8 @@ open class ModulePlugin : Plugin<Project> {
         compileSdk = versions.getIntOrThrow("version.sdk_compile"),
         buildTools = versions.getOrThrow("version.build_tools"),
         targetSdk = versions.getIntOrThrow("version.sdk_target"),
-        legacyNdk = versions.getOrThrow("version.ndk_legacy")
+        legacyNdk = versions.getOrThrow("version.ndk_legacy"),
+        primaryNdk = versions.getOrThrow("version.ndk_primary")
       )
     }
 
@@ -104,10 +109,11 @@ open class ModulePlugin : Plugin<Project> {
             minSdk = Config.MIN_SDK_VERSION
             multiDexEnabled = true
           }
-          flavorDimensions += "SDK"
+          flavorDimensions += arrayOf("SDK", "ABI")
           productFlavors {
             Sdk.VARIANTS.forEach { (_, variant) ->
               register(variant.flavor) {
+                dimension = "SDK"
                 externalNativeBuild.cmake.arguments(
                   "-DANDROID_PLATFORM=android-${variant.minSdk}",
                   "-DTGX_FLAVOR=${variant.flavor}"
@@ -121,6 +127,30 @@ open class ModulePlugin : Plugin<Project> {
                 }
               }
             }
+            Abi.VARIANTS.forEach { (_, variant) ->
+              register(variant.flavor) {
+                dimension = "ABI"
+                ndkVersion = if (variant.is64Bit) {
+                  versions.primaryNdk
+                } else {
+                  versions.legacyNdk
+                }
+                if (ndk.abiFilters.isNotEmpty())
+                  error(ndk.abiFilters.joinToString())
+                ndk.abiFilters.addAll(variant.filters)
+                externalNativeBuild.cmake.abiFilters(*variant.filters)
+                externalNativeBuild.ndkBuild.abiFilters(*variant.filters)
+              }
+            }
+          }
+
+          project.extensions.getByType(LibraryAndroidComponentsExtension::class.java).beforeVariants { variantBuilder ->
+            val sdkFlavor = variantBuilder.productFlavors.first { it.first == "SDK" }.second
+            val sdkVariant = Sdk.VARIANTS.values.first { it.flavor == sdkFlavor }
+            val abiFlavor = variantBuilder.productFlavors.first { it.first == "ABI" }.second
+            val abiVariant = Abi.VARIANTS.values.first { it.flavor == abiFlavor }
+            variantBuilder.enable = sdkVariant.minSdk >= abiVariant.minSdk &&
+              (variantBuilder.buildType != "debug" || abiVariant.flavor == "universal")
           }
         }
 

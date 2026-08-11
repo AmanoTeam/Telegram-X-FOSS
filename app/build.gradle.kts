@@ -447,9 +447,8 @@ android {
           into(project.layout.buildDirectory.dir("outputs/mapping/${variant.name}"))
           rename("mapping.txt", "$fileName.txt")
         }
-        tasks.named {
-          it.startsWith("assemble") && it.endsWith("Release")
-        }.configureEach {
+        val assembleTaskName = "assemble${variant.name.replaceFirstChar { it.uppercase() }}"
+        tasks.named { it == assembleTaskName }.configureEach {
           finalizedBy(copyTask)
         }
       }
