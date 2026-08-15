@@ -21,6 +21,11 @@
 	path = app/jni/third_party/lz4
 	url = https://github.com/lz4/lz4
 	shallow = true
+[submodule "androidx-media"]
+	path = thirdparty/androidx-media/legacy
+	url = https://github.com/androidx/media
+	shallow = true
+	branch = release
 [submodule "flac"]
 	path = app/jni/third_party/flac
 	url = https://github.com/xiph/flac
@@ -126,6 +131,12 @@
 	path = app/jni/tgvoip/third_party/webrtc_deps/third_party
 	url = https://chromium.googlesource.com/chromium/src/third_party
 	shallow = true
+[submodule "thirdparty/androidx-media/latest"]
+	path = thirdparty/androidx-media/latest
+	url = https://github.com/androidx/media
+[submodule "thirdparty/androidx-media/lollipop"]
+	path = thirdparty/androidx-media/lollipop
+	url = https://github.com/androidx/media
 [submodule "thirdparty/androidx-media/marshmallow"]
 	path = thirdparty/androidx-media/marshmallow
 	url = https://github.com/androidx/media

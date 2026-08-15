@@ -136,7 +136,11 @@ configure_and_build() {
 
   case ${FLAVOR} in
     legacy)
-      ANDROID_API=21
+      if [[ ${ABI} == "arm64-v8a" ]]; then
+        ANDROID_API=21
+      else
+        ANDROID_API=16
+      fi
     ;;
     lollipop)
       ANDROID_API=21
@@ -227,11 +231,9 @@ configure_and_build() {
 
 for ABI in arm64-v8a armeabi-v7a ; do
   for FLAVOR in $FLAVORS; do
-    if [[ "$FLAVOR" != "legacy" || $ABI == "armeabi-v7a" ]]; then
-      echo -e "${STYLE_INFO}- ffmpeg build start: ${ABI} ${FLAVOR}${STYLE_END}"
-      configure_and_build "$FLAVOR" "$ABI"
-      echo -e "${STYLE_INFO}- ffmpeg build finish: ${ABI} ${FLAVOR}${STYLE_END}"
-    fi
+    echo -e "${STYLE_INFO}- ffmpeg build start: ${ABI} ${FLAVOR}${STYLE_END}"
+    configure_and_build "$FLAVOR" "$ABI"
+    echo -e "${STYLE_INFO}- ffmpeg build finish: ${ABI} ${FLAVOR}${STYLE_END}"
   done
 done
 
