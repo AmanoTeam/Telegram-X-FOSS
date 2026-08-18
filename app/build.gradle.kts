@@ -227,13 +227,13 @@ android {
       variantBuilder.maxSdk = sdkVariant.maxSdk
     }
     variantBuilder.enable = sdkVariant.minSdk >= abiVariant.minSdk &&
-      (variantBuilder.buildType != "debug" || sdkVariant.flavor == "legacy" || abiVariant.flavor == "universal")
+      (variantBuilder.buildType != "debug" || abiVariant.flavor == "universal")
   }
   productFlavors {
     Sdk.VARIANTS.forEach { (sdkIndex, variant) ->
       create(variant.flavor) {
         dimension = "SDK"
-        isDefault = sdkIndex == Sdk.LATEST
+        isDefault = sdkIndex == Sdk.MARSHMALLOW
 
         minSdk = variant.minSdk
         if (variant.minSdk < 21) {
@@ -282,6 +282,7 @@ android {
         Sdk.VARIANTS.forEach { (subSdkIndex, subVariant) ->
           buildConfigBool("${subVariant.flavor.uppercase()}_FLAVOR", sdkIndex == subSdkIndex)
         }
+        buildConfigBool("LATEST_FLAVOR", sdkIndex == Sdk.LATEST)
 
         var extraProguardFileCount = 0
 
@@ -487,7 +488,6 @@ gradle.projectsEvaluated {
 }
 
 dependencies {
-  legacyImplementation(libs.androidx.multidex)
   implementation(project(":extension:${config.extension}"))
   // TDLib: https://github.com/tdlib/td/blob/master/CHANGELOG.md
   implementation(project(":tdlib"))
@@ -602,8 +602,6 @@ dependencies {
 
   // OSMDroid: https://github.com/osmdroid/osmdroid
   implementation(libs.osmdroid)
-  // Transcoder: https://github.com/natario1/Transcoder/blob/master/docs/_about/changelog.md
-  legacyImplementation(libs.transcoder)
   // https://github.com/mikereedell/sunrisesunsetlib-java
   implementation(libs.sunriseSunsetCalculator)
 

@@ -41,11 +41,7 @@ configure_abi() {
   LDFLAGS_=""
   case ${FLAVOR} in
     legacy)
-      if [[ ${ABI} == "arm64-v8a" ]]; then
-        ANDROID_API=21
-      else
-        ANDROID_API=16
-      fi
+      ANDROID_API=21
     ;;
     lollipop)
       ANDROID_API=21
@@ -173,9 +169,11 @@ configure_make() {
 
 for ABI in arm64-v8a armeabi-v7a ; do
   for FLAVOR in $FLAVORS; do
-    echo -e "${STYLE_INFO}- libvpx build start: ${ABI} ${FLAVOR}${STYLE_END}"
-    configure_make "$FLAVOR" "$ABI"
-    echo -e "${STYLE_INFO}- libvpx build finish: ${ABI} ${FLAVOR}${STYLE_END}"
+    if [[ "$FLAVOR" != "legacy" || $ABI == "armeabi-v7a" ]]; then
+      echo -e "${STYLE_INFO}- libvpx build start: ${ABI} ${FLAVOR}${STYLE_END}"
+      configure_make "$FLAVOR" "$ABI"
+      echo -e "${STYLE_INFO}- libvpx build finish: ${ABI} ${FLAVOR}${STYLE_END}"
+    fi
   done
 done
 
