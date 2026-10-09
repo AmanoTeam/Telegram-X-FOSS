@@ -49,9 +49,6 @@ fun loadLibraries() {
       }
     }
     val reLinker = ReLinker.recursively().log(logger)
-    if (BuildConfig.SHARED_STL) {
-      loadLibrary(reLinker, "c++_shared", BuildConfig.NDK_VERSION)
-    }
     loadLibrary(reLinker, "cryptox", BuildConfig.LIBRESSL_VERSION)
     loadLibrary(reLinker, "sslx", BuildConfig.LIBRESSL_VERSION)
     loadLibrary(reLinker, "tdjni", BuildConfig.TDLIB_VERSION)
