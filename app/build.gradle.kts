@@ -359,8 +359,6 @@ android {
 
     // Migrated from abi flavors
 
-    buildConfigString("NDK_VERSION", ndkVersion)
-    buildConfigBool("SHARED_STL", true)
     buildConfigBool("WEBP_ENABLED", true)
     buildConfigBool("GENERATING_BASELINE_PROFILE", generateBaselineProfile)
 
@@ -542,7 +540,7 @@ android {
           arguments(
             "-DANDROID_PLATFORM=android-${selectedMinSdk}",
             "-DANDROID_MIN_SDK_VERSION=${selectedMinSdk}",
-            "-DANDROID_STL=c++_shared",
+            "-DANDROID_STL=c++_static",
             "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON",
             "-DCMAKE_SKIP_RPATH=ON",
             "-DCMAKE_C_VISIBILITY_PRESET=hidden",

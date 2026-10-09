@@ -15,9 +15,6 @@ private fun loadLibrary(name: String) = trace("load:$name") {
 
 @Synchronized
 fun loadLibraries() {
-  if (BuildConfig.SHARED_STL) {
-    loadLibrary("c++_shared")
-  }
   loadLibrary("cryptox")
   loadLibrary("sslx")
   loadLibrary("tdjni")
