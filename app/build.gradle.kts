@@ -543,7 +543,7 @@ android {
           arguments(
             "-DANDROID_PLATFORM=android-${selectedMinSdk}",
             "-DANDROID_MIN_SDK_VERSION=${selectedMinSdk}",
-            "-DANDROID_STL=${if (appliedNdkVersion.ndkVersionMajor() >= 27) "c++_shared" else "c++_static"}",
+            "-DANDROID_STL=c++_static",
             "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON",
             "-DCMAKE_SKIP_RPATH=ON",
             "-DCMAKE_C_VISIBILITY_PRESET=hidden",
@@ -641,8 +641,6 @@ android {
         }
 
         ndkVersion = appliedNdkVersion
-        buildConfigString("NDK_VERSION", ndkVersion)
-        buildConfigBool("SHARED_STL", ndkVersion.ndkVersionMajor() >= 27)
         buildConfigBool("WEBP_ENABLED", true)
         if (ndk.abiFilters.isNotEmpty())
           error(ndk.abiFilters.joinToString())

@@ -135,7 +135,7 @@ open class ModulePlugin : Plugin<Project> {
                 externalNativeBuild.cmake.arguments(
                   "-DANDROID_PLATFORM=android-${selectedMinSdk}",
                   "-DANDROID_MIN_SDK_VERSION=${selectedMinSdk}",
-                  "-DANDROID_STL=${if (ndkVersion.ndkVersionMajor() >= 27) "c++_shared" else "c++_static"}",
+                  "-DANDROID_STL=c++_static",
                   "-DTGX_FLAVOR=${variant.flavor}"
                 )
                 sourceSets.getByName(variant.flavor) {
