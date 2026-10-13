@@ -114,11 +114,6 @@ open class ModulePlugin : Plugin<Project> {
             Abi.VARIANTS.forEach { (_, variant) ->
               register(variant.flavor) {
                 dimension = "ABI"
-                ndkVersion = if (variant.is64Bit) {
-                  build.primaryNdkVersion
-                } else {
-                  build.legacyNdkVersion
-                }
                 ndk.abiFilters.addAll(variant.filters)
                 externalNativeBuild.ndkBuild.abiFilters(*variant.filters)
                 externalNativeBuild.cmake.abiFilters(*variant.filters)
