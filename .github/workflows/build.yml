@@ -35,6 +35,9 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
+      - name: Free up some space
+        run: |
+          curl 'https://raw.githubusercontent.com/AmanoTeam/gha-free-space/refs/heads/master/main.sh' -sSf | bash
       - name: Set swap space
         uses: pierotofy/set-swap-space@master
         with:
@@ -45,8 +48,8 @@ jobs:
           java-version: '25'
       - name: Install required dependencies
         run: |
-          sudo apt install meson gperf
-          "${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager" --install 'ndk;23.2.8568313'
+          sudo apt-get update
+          sudo apt-get install gperf build-essential cmake libssl-dev zlib1g-dev automake libtool
       - name: Install android-gcc-cross
         if: matrix.target == 'gcc'
         run: |
