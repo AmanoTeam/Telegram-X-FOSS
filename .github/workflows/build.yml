@@ -49,7 +49,13 @@ jobs:
       - name: Install required dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install gperf build-essential cmake libssl-dev zlib1g-dev automake libtool
+          sudo apt-get -o Dir::Log::History=/dev/null -o Dir::Log::Terminal=/dev/null install gperf build-essential cmake libssl-dev zlib1g-dev automake libtool
+      - name: Install Android SDK
+        run: |
+          wget 'https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip' -O '/tmp/commandlinetools.zip'
+          unzip -d "${ANDROID_HOME}" '/tmp/commandlinetools.zip'
+          yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --licenses
+          yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --install 'ndk;23.2.8568313' 'ndk;30.0.16248370'
       - name: Install android-gcc-cross
         if: matrix.target == 'gcc'
         run: |
