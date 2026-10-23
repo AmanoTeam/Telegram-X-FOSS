@@ -35,6 +35,9 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
+      - name: Remove prebuilt binaries 
+        run: |
+            find . -type f '(' -name '*.a' -o -name '*.so' -o -name '*.o' ')' -delete
       - name: Free up some space
         run: |
           curl 'https://raw.githubusercontent.com/AmanoTeam/gha-free-space/refs/heads/master/main.sh' -sSf | bash
