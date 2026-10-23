@@ -53,6 +53,7 @@ jobs:
       - name: Install Android SDK
         run: |
           wget 'https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip' -O '/tmp/commandlinetools.zip'
+          mkdir --parent "${ANDROID_HOME}"
           unzip -d "${ANDROID_HOME}" '/tmp/commandlinetools.zip'
           yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --licenses
           yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --install 'ndk;23.2.8568313' 'ndk;30.0.16248370'
