@@ -56,8 +56,8 @@ jobs:
           sudo mkdir --parent "${ANDROID_HOME}"
           sudo chmod 777 "${ANDROID_HOME}"
           unzip -d "${ANDROID_HOME}" '/tmp/commandlinetools.zip'
-          yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --licenses
-          yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --install 'ndk;23.2.8568313' 'ndk;30.0.16248370'
+          yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --licenses --sdk_root="${ANDROID_HOME}"
+          yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --install 'ndk;23.2.8568313' 'ndk;30.0.16248370' --sdk_root="${ANDROID_HOME}"
       - name: Install android-gcc-cross
         if: matrix.target == 'gcc'
         run: |
