@@ -859,7 +859,12 @@ android {
         val modifiedVersionName = "$baseVersionName.$baseVersionCode$flavorVersionNameSuffix$buildTypeSuffix"
         output.versionName.set(modifiedVersionName)
 
-        val fileName = "${config.outputFileNamePrefix}-${modifiedVersionName}"
+        val abiSuffix = if (abi.isSingleAbi || (config.extension == "none" && sdkVariant.displayName.isNullOrEmpty())) {
+          "-${abi.toDisplayName()}"
+        } else {
+          ""
+        }
+        val fileName = "${config.outputFileNamePrefix}-${modifiedVersionName}${abiSuffix}"
         if (output is VariantOutputImpl) {
           output.outputFileName.set("$fileName.apk")
         }

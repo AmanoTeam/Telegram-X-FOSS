@@ -1,6 +1,6 @@
 #!/bin/bash
 # Installs Rust of version.rust of version.properties with its targets of Android by rustup, which
-# builds tlottie, and prints the value of rust.dir for local.properties. Run it again after a bump
+# builds tlottie, and writes the value of rust.dir for local.properties. Run it again after a bump
 # of version.rust to install the new version.
 set -e
 # shellcheck source=set-env.sh
@@ -43,4 +43,13 @@ for TARGET in ${TARGETS//,/ }; do
 done
 
 echo "Rust $RUST_VERSION is installed with targets $TARGETS"
-echo -e "${STYLE_INFO}rust.dir=$RUST_DIR${STYLE_END}"
+
+touch local.properties
+if grep -q '^rust\.dir=' local.properties; then
+  sed -i.bak "s|^rust\.dir=.*|rust.dir=$RUST_DIR|" local.properties
+  rm -f local.properties.bak
+else
+  printf 'rust.dir=%s\n' "$RUST_DIR" >> local.properties
+fi
+
+echo -e "${STYLE_INFO}rust.dir=$RUST_DIR written to local.properties${STYLE_END}"

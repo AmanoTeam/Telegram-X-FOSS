@@ -49,13 +49,15 @@ jobs:
       - name: Install required dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -o Dir::Log::History=/dev/null -o Dir::Log::Terminal=/dev/null install gperf build-essential cmake libssl-dev zlib1g-dev automake libtool
+          sudo apt-get -o Dir::Log::History=/dev/null -o Dir::Log::Terminal=/dev/null install gperf build-essential cmake libssl-dev zlib1g-dev automake libtool rustup
       - name: Install Android SDK
         run: |
           wget 'https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip' -O '/tmp/commandlinetools.zip'
+          sudo mkdir --parent "${ANDROID_HOME}"
+          sudo chmod 777 "${ANDROID_HOME}"
           unzip -d "${ANDROID_HOME}" '/tmp/commandlinetools.zip'
-          yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --licenses
-          yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --install 'ndk;23.2.8568313' 'ndk;30.0.16248370'
+          yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --licenses --sdk_root="${ANDROID_HOME}"
+          yes | "${ANDROID_HOME}/cmdline-tools/bin/sdkmanager" --install 'ndk;23.2.8568313' 'ndk;30.0.16248370' --sdk_root="${ANDROID_HOME}"
       - name: Install android-gcc-cross
         if: matrix.target == 'gcc'
         run: |
@@ -78,6 +80,7 @@ jobs:
       - name: Build
         run: |
           ./scripts/setup.sh --skip-sdk-setup
+          ./scripts/setup-rust.sh
           ./gradlew "${{ matrix.variant.task }}" ${{ matrix.variant.args }}
       - name: Sign APKs
         run: |
