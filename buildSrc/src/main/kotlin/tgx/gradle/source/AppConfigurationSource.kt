@@ -124,6 +124,8 @@ abstract class AppConfigurationSource : ValueSource<ApplicationConfig, AppConfig
         version.getProperty("version.jni"),
       leveldbVersion =
         version.getProperty("version.leveldb"),
+      libreSslVersion =
+        version.getOrThrow("version.libressl"),
       emojiVersion =
         version.getIntOrThrow("version.emoji"),
       creationDateMillis =

@@ -883,24 +883,8 @@ android {
           "String", "\"$baseVersionName.$baseVersionCode\"", null
         ))
 
-        var libreSslVersion = ""
-        val libreSslVersionFile = requireFile(project.isolated.rootProject.projectDirectory.file("libressl/patches/opensslv.h").asFile)
-        libreSslVersionFile.bufferedReader().use { reader ->
-          val regex = Regex("^#\\s*define\\s+LIBRESSL_VERSION_TEXT\\s+\"LibreSSL ([^\"]+)\"$")
-          while (true) {
-            val line = reader.readLine() ?: break
-            val result = regex.find(line)
-            if (result != null) {
-              libreSslVersion = result.groupValues[1]
-              break
-            }
-          }
-        }
-        if (libreSslVersion.isEmpty()) {
-          fatal("LibreSSL not found!")
-        }
         put("LIBRESSL_VERSION", BuildConfigField(
-          "String", "\"$libreSslVersion\"", null
+          "String", "\"${config.libreSslVersion}\"", null
         ))
       }
 

@@ -95,6 +95,7 @@ data class ApplicationConfig(
 
   val nativeLibraryVersion: String,
   val leveldbVersion: String,
+  val libreSslVersion: String,
   val emojiVersion: Int,
 
   val telegramApiId: Int,
