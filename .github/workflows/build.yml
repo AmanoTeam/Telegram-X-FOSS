@@ -84,7 +84,7 @@ jobs:
         run: |
           ./scripts/setup.sh --skip-sdk-setup
           ./scripts/setup-rust.sh
-          ./gradlew "${{ matrix.variant.task }}" ${{ matrix.variant.args }}
+          ./gradlew "${{ matrix.variant.task }}" ${{ matrix.variant.args }} -Pabi=all
       - name: Sign APKs
         run: |
           declare -r APKSIGNER="$(find "${ANDROID_HOME}/build-tools" -name apksigner | sort -V | tail -1)"
